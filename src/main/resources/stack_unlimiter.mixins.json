@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.asp1r.stackunlimiter.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "stack_unlimiter.refmap.json",
+  "mixins": [
+    "FriendlyByteBufMixin",
+    "ItemStackHandlerMixin",
+    "ItemStackMixin",
+    "SlotMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
