@@ -1,0 +1,116 @@
+name: Bug report
+description: Report a reproducible problem with Stack Unlimiter
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a problem. Please provide enough information to reproduce it.
+        Remove sensitive information from logs before attaching them.
+
+  - type: input
+    id: mod-version
+    attributes:
+      label: Stack Unlimiter version
+      description: Enter the exact version shown in the file name or mod list.
+      placeholder: "e.g. 0.1.7"
+    validations:
+      required: true
+
+  - type: input
+    id: minecraft-version
+    attributes:
+      label: Minecraft version
+      placeholder: Enter the exact version
+    validations:
+      required: true
+
+  - type: input
+    id: forge-version
+    attributes:
+      label: Forge version
+      placeholder: Enter the complete Forge version
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      options:
+        - Singleplayer
+        - Dedicated server
+        - Both singleplayer and dedicated server
+    validations:
+      required: true
+
+  - type: dropdown
+    id: isolated
+    attributes:
+      label: Does the problem occur with only Stack Unlimiter installed?
+      description: Test with Forge and Stack Unlimiter only when possible.
+      options:
+        - "Yes"
+        - "No"
+        - Not tested
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Problem description
+      description: Explain what went wrong and when it started happening.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Provide the smallest reliable sequence that causes the problem.
+      placeholder: |
+        1. Open ...
+        2. Place ...
+        3. Click ...
+        4. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: Describe what you expected to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Drag and drop latest.log, debug.log, or a crash report here. Do not paste extremely long logs directly.
+
+  - type: textarea
+    id: other-mods
+    attributes:
+      label: Other installed mods
+      description: List the other mods and their exact versions, or attach a mod list.
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add screenshots, videos, world details, or anything else that may help.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and did not find the same problem.
+          required: true
+        - label: I backed up any affected worlds before reproducing the problem.
+          required: true
