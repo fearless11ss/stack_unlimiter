@@ -3,6 +3,7 @@ package dev.asp1r.stackunlimiter.api;
 import dev.asp1r.stackunlimiter.internal.LongCountAccess;
 import dev.asp1r.stackunlimiter.internal.LongCountMath;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 /**
  * Public API for exact stack counts. Callers must not infer an exact count from
@@ -64,11 +65,13 @@ public final class StackCounts {
     }
 
     public static boolean isEligible(ItemStack stack) {
-        return stack != ItemStack.EMPTY && get(stack) > 0 && vanillaMaxStackSize(stack) > 1;
+        return stack != ItemStack.EMPTY
+                && stack.getItem() != Items.AIR
+                && vanillaMaxStackSize(stack) > 1;
     }
 
     public static int vanillaMaxStackSize(ItemStack stack) {
-        if (stack == ItemStack.EMPTY || get(stack) == 0) {
+        if (stack == ItemStack.EMPTY || stack.getItem() == Items.AIR) {
             return 1;
         }
         return Math.max(1, stack.getItem().getMaxStackSize(stack));

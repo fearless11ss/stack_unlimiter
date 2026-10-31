@@ -6,9 +6,16 @@
   "refmap": "stack_unlimiter.refmap.json",
   "mixins": [
     "FriendlyByteBufMixin",
+    "GiveCommandMixin",
+    "InventoryMixin",
+    "InventoryMenuMixin",
     "ItemStackHandlerMixin",
     "ItemStackMixin",
-    "SlotMixin"
+    "SlotMixin",
+    "StackedContentsMixin"
+  ],
+  "client": [
+    "GuiGraphicsMixin"
   ],
   "injectors": {
     "defaultRequire": 1

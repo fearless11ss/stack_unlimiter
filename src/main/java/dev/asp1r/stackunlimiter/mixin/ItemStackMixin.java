@@ -48,7 +48,7 @@ public abstract class ItemStackMixin implements LongCountAccess {
         ItemStack self = (ItemStack) (Object) this;
         LongCountNbt.writePersistent(
                 callback.getReturnValue(),
-                this.stackUnlimiter$exactCount,
+                this.stackUnlimiter$getLongCount(),
                 StackCounts.vanillaMaxStackSize(self)
         );
     }
@@ -77,7 +77,8 @@ public abstract class ItemStackMixin implements LongCountAccess {
         if (requested < 0) {
             throw new IllegalArgumentException("Stack count cannot be negative: " + requested);
         }
-        if (this.stackUnlimiter$exactCount > Integer.MAX_VALUE
+        long current = this.stackUnlimiter$getLongCount();
+        if (current > Integer.MAX_VALUE
                 && requested != 0
                 && requested != Integer.MAX_VALUE) {
             throw new IllegalStateException(
@@ -85,7 +86,7 @@ public abstract class ItemStackMixin implements LongCountAccess {
             );
         }
 
-        if (requested != Integer.MAX_VALUE || this.stackUnlimiter$exactCount <= Integer.MAX_VALUE) {
+        if (requested != Integer.MAX_VALUE || current <= Integer.MAX_VALUE) {
             this.stackUnlimiter$setLongCountUnchecked(requested);
         }
         callback.cancel();
@@ -94,7 +95,7 @@ public abstract class ItemStackMixin implements LongCountAccess {
     @Inject(method = "grow", at = @At("HEAD"), cancellable = true)
     private void stackUnlimiter$growExact(int amount, CallbackInfo callback) {
         this.stackUnlimiter$setLongCountUnchecked(
-                LongCountMath.addExactNonNegative(this.stackUnlimiter$exactCount, amount)
+                LongCountMath.addExactNonNegative(this.stackUnlimiter$getLongCount(), amount)
         );
         callback.cancel();
     }
@@ -105,7 +106,7 @@ public abstract class ItemStackMixin implements LongCountAccess {
             throw new IllegalArgumentException("Shrink amount must be non-negative");
         }
         this.stackUnlimiter$setLongCountUnchecked(
-                LongCountMath.subtractFloorZero(this.stackUnlimiter$exactCount, amount)
+                LongCountMath.subtractFloorZero(this.stackUnlimiter$getLongCount(), amount)
         );
         callback.cancel();
     }
@@ -119,7 +120,9 @@ public abstract class ItemStackMixin implements LongCountAccess {
     private void stackUnlimiter$copyExact(CallbackInfoReturnable<ItemStack> callback) {
         ItemStack result = callback.getReturnValue();
         if (result != ItemStack.EMPTY) {
-            ((LongCountAccess) (Object) result).stackUnlimiter$setLongCountUnchecked(this.stackUnlimiter$exactCount);
+            ((LongCountAccess) (Object) result).stackUnlimiter$setLongCountUnchecked(
+                    this.stackUnlimiter$getLongCount()
+            );
         }
     }
 
