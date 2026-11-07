@@ -134,6 +134,22 @@ public final class StackCountGameTests {
         helper.succeed();
     }
 
+    @GameTest(name = "drop_selected_item_removes_entire_oversized_stack")
+    public static void dropSelectedItemRemovesEntireOversizedStack(GameTestHelper helper) {
+        ServerPlayer player = createPlayer(helper, "stack-unlimiter-drop-test");
+        player.getInventory().clearContent();
+
+        ItemStack planks = new ItemStack(Items.OAK_PLANKS);
+        StackCounts.set(planks, 1_000_000);
+        player.getInventory().setItem(player.getInventory().getSelectedSlot(), planks);
+
+        ItemStack removed = player.getInventory().removeFromSelected(true);
+
+        assertEquals(1_000_000, StackCounts.get(removed), "fully dropped plank count");
+        assertEquals(0, StackCounts.get(player.getInventory().getSelectedItem()), "remaining selected stack");
+        helper.succeed();
+    }
+
     @GameTest(name = "recipe_accounting_uses_the_exact_count")
     public static void recipeAccountingUsesTheExactCount(GameTestHelper helper) {
         RecipeHolder<?> craftingTable = craftingTableRecipe(helper);

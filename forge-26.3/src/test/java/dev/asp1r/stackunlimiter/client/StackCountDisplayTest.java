@@ -18,4 +18,10 @@ class StackCountDisplayTest {
 
         assertTrue(unscaledWidth * scale <= StackCountDisplay.MAX_LABEL_WIDTH);
     }
+
+    @Test
+    void largeStackLabelUsesAnOpaqueColor() {
+        assertEquals(0xFF, StackCountDisplay.TEXT_COLOR >>> 24);
+        assertEquals("1M", StackCountDisplay.format(1_000_000));
+    }
 }

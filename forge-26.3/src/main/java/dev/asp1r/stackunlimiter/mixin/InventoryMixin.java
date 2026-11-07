@@ -11,6 +11,30 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(value = Inventory.class, remap = false)
 public abstract class InventoryMixin {
     @Inject(
+            method = "removeFromSelected",
+            at = @At("HEAD"),
+            cancellable = true
+    )
+    private void stackUnlimiter$removeEntireSelectedStack(
+            boolean all,
+            CallbackInfoReturnable<ItemStack> callback
+    ) {
+        if (!all) {
+            return;
+        }
+
+        Inventory inventory = (Inventory) (Object) this;
+        ItemStack selected = inventory.getSelectedItem();
+        if (selected.isEmpty() || StackCounts.get(selected) <= selected.getCount()) {
+            return;
+        }
+
+        ItemStack removed = StackCounts.split(selected, StackCounts.get(selected));
+        inventory.setItem(inventory.getSelectedSlot(), ItemStack.EMPTY);
+        callback.setReturnValue(removed);
+    }
+
+    @Inject(
             method = "getSlotWithRemainingSpace",
             at = @At("HEAD"),
             cancellable = true

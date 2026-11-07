@@ -44,7 +44,7 @@ public abstract class GuiGraphicsMixin {
         graphics.pose().pushMatrix();
         graphics.pose().translate(x + 17.0F, y + 9.0F);
         graphics.pose().scale(scale, scale);
-        graphics.text(font, label, -width, 0, 0xFFFFFF, true);
+        graphics.text(font, label, -width, 0, StackCountDisplay.TEXT_COLOR, true);
         graphics.pose().popMatrix();
         callback.cancel();
     }

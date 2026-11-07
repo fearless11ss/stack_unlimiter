@@ -4,6 +4,7 @@ import java.util.Locale;
 
 public final class StackCountDisplay {
     public static final int MAX_LABEL_WIDTH = 16;
+    public static final int TEXT_COLOR = 0xFFFFFFFF;
     private static final String[] SUFFIXES = {"", "K", "M", "B", "T", "Q", "E"};
 
     private StackCountDisplay() {

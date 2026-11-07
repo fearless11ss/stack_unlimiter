@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "stack_unlimiter:drop_selected_item_removes_entire_oversized_stack",
+  "max_ticks": 100,
+  "structure": "forge:empty3x3x3"
+}
