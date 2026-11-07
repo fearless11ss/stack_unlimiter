@@ -5,6 +5,7 @@ import com.mojang.serialization.DynamicOps;
 import dev.asp1r.stackunlimiter.StackUnlimiter;
 import dev.asp1r.stackunlimiter.api.StackCounts;
 import io.netty.buffer.Unpooled;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -12,8 +13,10 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.Connection;
+import net.minecraft.network.HashedStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.PacketFlow;
+import net.minecraft.network.protocol.game.ServerboundContainerClickPacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
@@ -23,6 +26,7 @@ import net.minecraft.server.permissions.LevelBasedPermissionSet;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.util.Prediction;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.StackedItemContents;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.CraftingContainer;
@@ -147,6 +151,61 @@ public final class StackCountGameTests {
 
         assertEquals(1_000_000, StackCounts.get(removed), "fully dropped plank count");
         assertEquals(0, StackCounts.get(player.getInventory().getSelectedItem()), "remaining selected stack");
+        helper.succeed();
+    }
+
+    @GameTest(name = "oversized_item_entity_pickup_preserves_exact_count")
+    public static void oversizedItemEntityPickupPreservesExactCount(GameTestHelper helper) {
+        ServerPlayer player = createPlayer(helper, "stack-unlimiter-pickup-test");
+
+        for (int attempt = 0; attempt < 100; attempt++) {
+            player.getInventory().clearContent();
+            ItemStack planks = new ItemStack(Items.OAK_PLANKS);
+            StackCounts.set(planks, 1_000_000);
+            ItemEntity dropped = new ItemEntity(helper.getLevel(), 0, 4, 0, planks);
+            dropped.setNoPickUpDelay();
+
+            dropped.playerTouch(player);
+
+            assertEquals(
+                    1_000_000,
+                    countInventoryItem(player, Items.OAK_PLANKS),
+                    "picked-up plank count on attempt " + attempt
+            );
+        }
+        helper.succeed();
+    }
+
+    @GameTest(name = "container_click_packet_bulk_crafts_all_results")
+    public static void containerClickPacketBulkCraftsAllResults(GameTestHelper helper) {
+        ServerPlayer player = createConnectedPlayer(helper, "stack-unlimiter-packet-craft-test");
+        player.getInventory().clearContent();
+
+        CraftingContainer grid = player.inventoryMenu.getCraftSlots();
+        for (int slot = 0; slot < 4; slot++) {
+            ItemStack planks = new ItemStack(Items.OAK_PLANKS);
+            StackCounts.set(planks, 250_000);
+            grid.setItem(slot, planks);
+        }
+
+        player.connection.handleContainerClick(new ServerboundContainerClickPacket(
+                player.inventoryMenu.containerId,
+                player.inventoryMenu.getStateId(),
+                (short) 0,
+                (byte) 0,
+                ContainerInput.QUICK_MOVE,
+                Int2ObjectMaps.emptyMap(),
+                HashedStack.EMPTY
+        ));
+
+        assertEquals(
+                250_000,
+                countInventoryItem(player, Items.CRAFTING_TABLE),
+                "crafting tables collected through click packet"
+        );
+        for (int slot = 0; slot < 4; slot++) {
+            assertEquals(0, StackCounts.get(grid.getItem(slot)), "remaining packet ingredient in slot " + slot);
+        }
         helper.succeed();
     }
 

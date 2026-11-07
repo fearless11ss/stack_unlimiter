@@ -1,6 +1,7 @@
 package dev.asp1r.stackunlimiter.mixin;
 
 import dev.asp1r.stackunlimiter.api.StackCounts;
+import dev.asp1r.stackunlimiter.internal.BulkCraftingDispatch;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -28,6 +29,10 @@ public abstract class InventoryMenuMixin {
             int slotIndex,
             CallbackInfoReturnable<ItemStack> callback
     ) {
+        if (BulkCraftingDispatch.shouldDeferResultClickToServer(player.level().isClientSide(), slotIndex)) {
+            callback.setReturnValue(ItemStack.EMPTY);
+            return;
+        }
         if (slotIndex != 0) {
             return;
         }
