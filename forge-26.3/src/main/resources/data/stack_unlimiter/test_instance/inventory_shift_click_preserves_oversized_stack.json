@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "stack_unlimiter:inventory_shift_click_preserves_oversized_stack",
+  "max_ticks": 100,
+  "structure": "forge:empty3x3x3"
+}

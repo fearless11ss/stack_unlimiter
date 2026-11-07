@@ -7,6 +7,7 @@ import dev.asp1r.stackunlimiter.api.StackCounts;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.NbtOps;
@@ -34,11 +35,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.gametest.GameTest;
 import net.minecraftforge.gametest.GameTestDontPrefix;
 import net.minecraftforge.gametest.GameTestNamespace;
 
 import java.util.UUID;
+import java.util.List;
 
 @GameTestNamespace(StackUnlimiter.MOD_ID)
 @GameTestDontPrefix
@@ -151,6 +155,44 @@ public final class StackCountGameTests {
 
         assertEquals(1_000_000, StackCounts.get(removed), "fully dropped plank count");
         assertEquals(0, StackCounts.get(player.getInventory().getSelectedItem()), "remaining selected stack");
+        helper.succeed();
+    }
+
+    @GameTest(name = "inventory_throw_drops_one_exact_stack")
+    public static void inventoryThrowDropsOneExactStack(GameTestHelper helper) {
+        ServerPlayer player = createPlayer(helper, "stack-unlimiter-menu-drop-test");
+        player.getInventory().clearContent();
+        player.setPos(Vec3.atCenterOf(helper.absolutePos(new BlockPos(1, 1, 1))));
+
+        ItemStack planks = new ItemStack(Items.OAK_PLANKS);
+        StackCounts.set(planks, 100_000);
+        player.getInventory().setItem(0, planks);
+
+        player.inventoryMenu.clicked(36, 1, ContainerInput.THROW, player);
+
+        assertEquals(0, countInventoryItem(player, Items.OAK_PLANKS), "remaining planks after menu throw");
+        List<ItemEntity> dropped = helper.getLevel().getEntitiesOfClass(
+                ItemEntity.class,
+                AABB.ofSize(player.position(), 8, 8, 8)
+        );
+        assertEquals(1, dropped.size(), "dropped item entity count");
+        assertEquals(100_000, StackCounts.get(dropped.getFirst().getItem()), "dropped exact plank count");
+        helper.succeed();
+    }
+
+    @GameTest(name = "inventory_shift_click_preserves_oversized_stack")
+    public static void inventoryShiftClickPreservesOversizedStack(GameTestHelper helper) {
+        ServerPlayer player = createPlayer(helper, "stack-unlimiter-menu-shift-test");
+        player.getInventory().clearContent();
+
+        ItemStack planks = new ItemStack(Items.OAK_PLANKS);
+        StackCounts.set(planks, 100_000);
+        player.getInventory().setItem(0, planks);
+
+        player.inventoryMenu.clicked(36, 0, ContainerInput.QUICK_MOVE, player);
+
+        assertEquals(100_000, countInventoryItem(player, Items.OAK_PLANKS), "plank total after shift-click");
+        assertEquals(1, countOccupiedInventorySlots(player), "occupied slots after shift-click");
         helper.succeed();
     }
 

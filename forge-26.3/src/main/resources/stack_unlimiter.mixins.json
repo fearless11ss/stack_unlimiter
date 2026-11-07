@@ -4,6 +4,7 @@
   "package": "dev.asp1r.stackunlimiter.mixin",
   "mixins": [
     "AbstractCraftingMenuAccessor",
+    "AbstractContainerMenuInteractionMixin",
     "GiveCommandMixin",
     "InventoryMixin",
     "InventoryMenuMixin",
