@@ -24,4 +24,10 @@ class StackCountDisplayTest {
         assertEquals(0xFF, StackCountDisplay.TEXT_COLOR >>> 24);
         assertEquals("1M", StackCountDisplay.format(1_000_000));
     }
+
+    @Test
+    void rendersTheExactCountImmediatelyAboveTheVanillaLimit() {
+        assertTrue(StackCountDisplay.requiresExactLabel(65, 64));
+        assertEquals("65", StackCountDisplay.format(65));
+    }
 }

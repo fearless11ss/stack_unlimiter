@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "stack_unlimiter:item_entity_pickup_grows_existing_full_stack",
+  "max_ticks": 100,
+  "structure": "forge:empty3x3x3"
+}

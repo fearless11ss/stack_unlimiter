@@ -176,6 +176,30 @@ public final class StackCountGameTests {
         helper.succeed();
     }
 
+    @GameTest(name = "item_entity_pickup_grows_existing_full_stack")
+    public static void itemEntityPickupGrowsExistingFullStack(GameTestHelper helper) {
+        ServerPlayer player = createPlayer(helper, "stack-unlimiter-existing-stack-pickup-test");
+        player.getInventory().clearContent();
+        player.getInventory().setItem(0, new ItemStack(Items.CHERRY_LOG, 64));
+
+        ItemEntity dropped = new ItemEntity(
+                helper.getLevel(),
+                0,
+                4,
+                0,
+                new ItemStack(Items.CHERRY_LOG, 1)
+        );
+        dropped.setNoPickUpDelay();
+
+        dropped.playerTouch(player);
+
+        assertEquals(65, countInventoryItem(player, Items.CHERRY_LOG), "merged cherry log count");
+        if (!dropped.isRemoved()) {
+            throw new GameTestAssertException(Component.literal("picked-up cherry log entity was not removed"), 0);
+        }
+        helper.succeed();
+    }
+
     @GameTest(name = "container_click_packet_bulk_crafts_all_results")
     public static void containerClickPacketBulkCraftsAllResults(GameTestHelper helper) {
         ServerPlayer player = createConnectedPlayer(helper, "stack-unlimiter-packet-craft-test");

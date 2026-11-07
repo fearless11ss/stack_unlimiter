@@ -30,7 +30,7 @@ public abstract class GuiGraphicsMixin {
         }
 
         long exactCount = StackCounts.get(stack);
-        if (exactCount < 1_000) {
+        if (!StackCountDisplay.requiresExactLabel(exactCount, stack.getCount())) {
             return;
         }
 

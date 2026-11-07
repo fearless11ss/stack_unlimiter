@@ -34,6 +34,10 @@ public final class StackCountDisplay {
         return number + SUFFIXES[suffix];
     }
 
+    public static boolean requiresExactLabel(long exactCount, int vanillaCount) {
+        return exactCount != vanillaCount;
+    }
+
     public static float scaleForWidth(int width) {
         if (width <= 0 || width <= MAX_LABEL_WIDTH) {
             return 1.0F;
