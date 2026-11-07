@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "stack_unlimiter:chest_shift_click_moves_exact_stack_to_player",
+  "max_ticks": 100,
+  "structure": "forge:empty3x3x3"
+}

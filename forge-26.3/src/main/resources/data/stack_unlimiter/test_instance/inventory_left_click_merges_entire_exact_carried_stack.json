@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "stack_unlimiter:inventory_left_click_merges_entire_exact_carried_stack",
+  "max_ticks": 100,
+  "structure": "forge:empty3x3x3"
+}

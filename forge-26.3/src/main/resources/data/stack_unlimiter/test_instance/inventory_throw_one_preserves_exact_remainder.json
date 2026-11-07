@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "stack_unlimiter:inventory_throw_one_preserves_exact_remainder",
+  "max_ticks": 100,
+  "structure": "forge:empty3x3x3"
+}

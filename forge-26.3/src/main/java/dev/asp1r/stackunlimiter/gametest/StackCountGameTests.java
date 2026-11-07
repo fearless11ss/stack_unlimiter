@@ -27,11 +27,15 @@ import net.minecraft.server.permissions.LevelBasedPermissionSet;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.util.Prediction;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.StackedItemContents;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -40,6 +44,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.gametest.GameTest;
 import net.minecraftforge.gametest.GameTestDontPrefix;
 import net.minecraftforge.gametest.GameTestNamespace;
+import net.minecraftforge.items.ItemStackHandler;
 
 import java.util.UUID;
 import java.util.List;
@@ -225,6 +230,285 @@ public final class StackCountGameTests {
 
         assertEquals(250_000, StackCounts.get(player.inventoryMenu.getCarried()), "left-click carried count");
         assertEquals(0, StackCounts.get(player.getInventory().getItem(0)), "left-click remaining count");
+        helper.succeed();
+    }
+
+    @GameTest(name = "inventory_left_click_places_entire_exact_carried_stack")
+    public static void inventoryLeftClickPlacesEntireExactCarriedStack(GameTestHelper helper) {
+        ServerPlayer player = createPlayer(helper, "stack-unlimiter-place-all-test");
+        player.getInventory().clearContent();
+        player.inventoryMenu.setCarried(exactStack(Items.OAK_PLANKS, 250_000));
+
+        player.inventoryMenu.clicked(36, 0, ContainerInput.PICKUP, player);
+
+        assertEquals(250_000, StackCounts.get(player.getInventory().getItem(0)), "left-click placed count");
+        assertEquals(0, StackCounts.get(player.inventoryMenu.getCarried()), "left-click carried remainder");
+        helper.succeed();
+    }
+
+    @GameTest(name = "inventory_right_click_places_one_from_exact_carried_stack")
+    public static void inventoryRightClickPlacesOneFromExactCarriedStack(GameTestHelper helper) {
+        ServerPlayer player = createPlayer(helper, "stack-unlimiter-place-one-test");
+        player.getInventory().clearContent();
+        player.inventoryMenu.setCarried(exactStack(Items.OAK_PLANKS, 250_000));
+
+        player.inventoryMenu.clicked(36, 1, ContainerInput.PICKUP, player);
+
+        assertEquals(1, StackCounts.get(player.getInventory().getItem(0)), "right-click placed count");
+        assertEquals(249_999, StackCounts.get(player.inventoryMenu.getCarried()), "right-click carried remainder");
+        helper.succeed();
+    }
+
+    @GameTest(name = "inventory_left_click_merges_entire_exact_carried_stack")
+    public static void inventoryLeftClickMergesEntireExactCarriedStack(GameTestHelper helper) {
+        ServerPlayer player = createPlayer(helper, "stack-unlimiter-merge-all-test");
+        player.getInventory().clearContent();
+        player.getInventory().setItem(0, exactStack(Items.OAK_PLANKS, 100_000));
+        player.inventoryMenu.setCarried(exactStack(Items.OAK_PLANKS, 250_000));
+
+        player.inventoryMenu.clicked(36, 0, ContainerInput.PICKUP, player);
+
+        assertEquals(350_000, StackCounts.get(player.getInventory().getItem(0)), "left-click merged count");
+        assertEquals(0, StackCounts.get(player.inventoryMenu.getCarried()), "left-click merge remainder");
+        helper.succeed();
+    }
+
+    @GameTest(name = "inventory_right_click_merges_one_from_exact_carried_stack")
+    public static void inventoryRightClickMergesOneFromExactCarriedStack(GameTestHelper helper) {
+        ServerPlayer player = createPlayer(helper, "stack-unlimiter-merge-one-test");
+        player.getInventory().clearContent();
+        player.getInventory().setItem(0, exactStack(Items.OAK_PLANKS, 100_000));
+        player.inventoryMenu.setCarried(exactStack(Items.OAK_PLANKS, 250_000));
+
+        player.inventoryMenu.clicked(36, 1, ContainerInput.PICKUP, player);
+
+        assertEquals(100_001, StackCounts.get(player.getInventory().getItem(0)), "right-click merged count");
+        assertEquals(249_999, StackCounts.get(player.inventoryMenu.getCarried()), "right-click merge remainder");
+        helper.succeed();
+    }
+
+    @GameTest(name = "inventory_left_click_swaps_exact_stacks")
+    public static void inventoryLeftClickSwapsExactStacks(GameTestHelper helper) {
+        ServerPlayer player = createPlayer(helper, "stack-unlimiter-click-swap-test");
+        player.getInventory().clearContent();
+        player.getInventory().setItem(0, exactStack(Items.COBBLESTONE, 100_000));
+        player.inventoryMenu.setCarried(exactStack(Items.OAK_PLANKS, 250_000));
+
+        player.inventoryMenu.clicked(36, 0, ContainerInput.PICKUP, player);
+
+        assertStack(Items.OAK_PLANKS, 250_000, player.getInventory().getItem(0), "left-click swapped slot");
+        assertStack(Items.COBBLESTONE, 100_000, player.inventoryMenu.getCarried(), "left-click swapped cursor");
+        helper.succeed();
+    }
+
+    @GameTest(name = "inventory_outside_clicks_drop_exact_carried_amounts")
+    public static void inventoryOutsideClicksDropExactCarriedAmounts(GameTestHelper helper) {
+        ServerPlayer player = createPlayer(helper, "stack-unlimiter-outside-drop-test");
+        player.getInventory().clearContent();
+        player.setPos(Vec3.atCenterOf(helper.absolutePos(new BlockPos(1, 1, 1))));
+        player.inventoryMenu.setCarried(exactStack(Items.OAK_PLANKS, 250_000));
+
+        player.inventoryMenu.clicked(AbstractContainerMenu.SLOT_CLICKED_OUTSIDE, 1, ContainerInput.PICKUP, player);
+        assertEquals(249_999, StackCounts.get(player.inventoryMenu.getCarried()), "secondary outside-click remainder");
+        player.inventoryMenu.clicked(AbstractContainerMenu.SLOT_CLICKED_OUTSIDE, 0, ContainerInput.PICKUP, player);
+
+        assertEquals(0, StackCounts.get(player.inventoryMenu.getCarried()), "primary outside-click remainder");
+        List<ItemEntity> dropped = helper.getLevel().getEntitiesOfClass(
+                ItemEntity.class,
+                AABB.ofSize(player.position(), 8, 8, 8)
+        );
+        assertEquals(2, dropped.size(), "outside-click entity count");
+        assertEquals(250_000, dropped.stream().mapToLong(entity -> StackCounts.get(entity.getItem())).sum(),
+                "outside-click dropped total");
+        helper.succeed();
+    }
+
+    @GameTest(name = "inventory_number_key_swaps_exact_stacks")
+    public static void inventoryNumberKeySwapsExactStacks(GameTestHelper helper) {
+        ServerPlayer player = createPlayer(helper, "stack-unlimiter-number-swap-test");
+        player.getInventory().clearContent();
+        player.getInventory().setItem(0, exactStack(Items.OAK_PLANKS, 250_000));
+        player.getInventory().setItem(9, exactStack(Items.COBBLESTONE, 100_000));
+
+        player.inventoryMenu.clicked(9, 0, ContainerInput.SWAP, player);
+
+        assertStack(Items.COBBLESTONE, 100_000, player.getInventory().getItem(0), "number-key hotbar stack");
+        assertStack(Items.OAK_PLANKS, 250_000, player.getInventory().getItem(9), "number-key inventory stack");
+        helper.succeed();
+    }
+
+    @GameTest(name = "inventory_pickup_all_collects_all_exact_stacks")
+    public static void inventoryPickupAllCollectsAllExactStacks(GameTestHelper helper) {
+        ServerPlayer player = createPlayer(helper, "stack-unlimiter-pickup-all-test");
+        player.getInventory().clearContent();
+        player.getInventory().setItem(0, exactStack(Items.OAK_PLANKS, 100_000));
+        player.getInventory().setItem(1, exactStack(Items.OAK_PLANKS, 150_000));
+        player.inventoryMenu.setCarried(exactStack(Items.OAK_PLANKS, 50_000));
+
+        player.inventoryMenu.clicked(38, 0, ContainerInput.PICKUP_ALL, player);
+
+        assertEquals(300_000, StackCounts.get(player.inventoryMenu.getCarried()), "pickup-all carried total");
+        assertEquals(0, countInventoryItem(player, Items.OAK_PLANKS), "pickup-all inventory remainder");
+        helper.succeed();
+    }
+
+    @GameTest(name = "inventory_primary_drag_evenly_distributes_exact_stack")
+    public static void inventoryPrimaryDragEvenlyDistributesExactStack(GameTestHelper helper) {
+        ServerPlayer player = createPlayer(helper, "stack-unlimiter-even-drag-test");
+        player.getInventory().clearContent();
+        player.inventoryMenu.setCarried(exactStack(Items.OAK_PLANKS, 250_001));
+
+        dragAcross(player, 0, 36, 37);
+
+        assertEquals(125_000, StackCounts.get(player.getInventory().getItem(0)), "primary drag first slot");
+        assertEquals(125_000, StackCounts.get(player.getInventory().getItem(1)), "primary drag second slot");
+        assertEquals(1, StackCounts.get(player.inventoryMenu.getCarried()), "primary drag remainder");
+        helper.succeed();
+    }
+
+    @GameTest(name = "inventory_secondary_drag_places_one_per_slot")
+    public static void inventorySecondaryDragPlacesOnePerSlot(GameTestHelper helper) {
+        ServerPlayer player = createPlayer(helper, "stack-unlimiter-one-drag-test");
+        player.getInventory().clearContent();
+        player.inventoryMenu.setCarried(exactStack(Items.OAK_PLANKS, 250_000));
+
+        dragAcross(player, 1, 36, 37, 38);
+
+        assertEquals(1, StackCounts.get(player.getInventory().getItem(0)), "secondary drag first slot");
+        assertEquals(1, StackCounts.get(player.getInventory().getItem(1)), "secondary drag second slot");
+        assertEquals(1, StackCounts.get(player.getInventory().getItem(2)), "secondary drag third slot");
+        assertEquals(249_997, StackCounts.get(player.inventoryMenu.getCarried()), "secondary drag remainder");
+        helper.succeed();
+    }
+
+    @GameTest(name = "inventory_throw_one_preserves_exact_remainder")
+    public static void inventoryThrowOnePreservesExactRemainder(GameTestHelper helper) {
+        ServerPlayer player = createPlayer(helper, "stack-unlimiter-throw-one-test");
+        player.getInventory().clearContent();
+        player.setPos(Vec3.atCenterOf(helper.absolutePos(new BlockPos(1, 1, 1))));
+        player.getInventory().setItem(0, exactStack(Items.OAK_PLANKS, 250_000));
+
+        player.inventoryMenu.clicked(36, 0, ContainerInput.THROW, player);
+
+        assertEquals(249_999, StackCounts.get(player.getInventory().getItem(0)), "throw-one remainder");
+        assertEquals(1, helper.getLevel().getEntitiesOfClass(
+                ItemEntity.class,
+                AABB.ofSize(player.position(), 8, 8, 8)
+        ).stream().mapToLong(entity -> StackCounts.get(entity.getItem())).sum(), "throw-one dropped total");
+        helper.succeed();
+    }
+
+    @GameTest(name = "inventory_menu_close_returns_exact_carried_stack")
+    public static void inventoryMenuCloseReturnsExactCarriedStack(GameTestHelper helper) {
+        ServerPlayer player = createConnectedPlayer(helper, "stack-unlimiter-close-menu-test");
+        player.getInventory().clearContent();
+        player.inventoryMenu.setCarried(exactStack(Items.OAK_PLANKS, 250_000));
+
+        player.inventoryMenu.removed(player);
+
+        assertEquals(250_000, countInventoryItem(player, Items.OAK_PLANKS), "menu-close inventory total");
+        assertEquals(0, StackCounts.get(player.inventoryMenu.getCarried()), "menu-close carried remainder");
+        assertEquals(1, countOccupiedInventorySlots(player), "menu-close occupied slots");
+        helper.succeed();
+    }
+
+    @GameTest(name = "inventory_clone_uses_the_unlimited_maximum")
+    public static void inventoryCloneUsesTheUnlimitedMaximum(GameTestHelper helper) {
+        ServerPlayer player = createPlayer(helper, "stack-unlimiter-clone-test");
+        player.getInventory().clearContent();
+        player.getAbilities().instabuild = true;
+        player.getInventory().setItem(0, exactStack(Items.OAK_PLANKS, 250_000));
+
+        player.inventoryMenu.clicked(36, 2, ContainerInput.CLONE, player);
+
+        assertEquals(Integer.MAX_VALUE, StackCounts.get(player.inventoryMenu.getCarried()), "cloned carried count");
+        assertEquals(250_000, StackCounts.get(player.getInventory().getItem(0)), "cloned source count");
+        helper.succeed();
+    }
+
+    @GameTest(name = "chest_shift_click_moves_exact_stack_to_player")
+    public static void chestShiftClickMovesExactStackToPlayer(GameTestHelper helper) {
+        ServerPlayer player = createPlayer(helper, "stack-unlimiter-chest-to-player-test");
+        player.getInventory().clearContent();
+        SimpleContainer chest = new SimpleContainer(27);
+        chest.setItem(0, exactStack(Items.OAK_PLANKS, 250_000));
+        ChestMenu menu = ChestMenu.threeRows(1, player.getInventory(), chest);
+
+        menu.clicked(0, 0, ContainerInput.QUICK_MOVE, player);
+
+        assertEquals(0, StackCounts.get(chest.getItem(0)), "chest source remainder");
+        assertEquals(250_000, countInventoryItem(player, Items.OAK_PLANKS), "chest-to-player total");
+        assertEquals(1, countOccupiedInventorySlots(player), "chest-to-player occupied slots");
+        helper.succeed();
+    }
+
+    @GameTest(name = "chest_shift_click_moves_exact_stack_from_player")
+    public static void chestShiftClickMovesExactStackFromPlayer(GameTestHelper helper) {
+        ServerPlayer player = createPlayer(helper, "stack-unlimiter-player-to-chest-test");
+        player.getInventory().clearContent();
+        player.getInventory().setItem(0, exactStack(Items.OAK_PLANKS, 250_000));
+        SimpleContainer chest = new SimpleContainer(27);
+        ChestMenu menu = ChestMenu.threeRows(1, player.getInventory(), chest);
+
+        menu.clicked(54, 0, ContainerInput.QUICK_MOVE, player);
+
+        assertEquals(0, countInventoryItem(player, Items.OAK_PLANKS), "player-to-chest inventory remainder");
+        assertEquals(250_000, StackCounts.get(chest.getItem(0)), "player-to-chest total");
+        helper.succeed();
+    }
+
+    @GameTest(name = "chest_shift_click_merges_into_existing_exact_stack")
+    public static void chestShiftClickMergesIntoExistingExactStack(GameTestHelper helper) {
+        ServerPlayer player = createPlayer(helper, "stack-unlimiter-chest-merge-test");
+        player.getInventory().clearContent();
+        player.getInventory().setItem(0, exactStack(Items.OAK_PLANKS, 100_000));
+        SimpleContainer chest = new SimpleContainer(27);
+        chest.setItem(0, exactStack(Items.OAK_PLANKS, 250_000));
+        ChestMenu menu = ChestMenu.threeRows(1, player.getInventory(), chest);
+
+        menu.clicked(0, 0, ContainerInput.QUICK_MOVE, player);
+
+        assertEquals(0, StackCounts.get(chest.getItem(0)), "chest merge source remainder");
+        assertEquals(350_000, countInventoryItem(player, Items.OAK_PLANKS), "chest merge player total");
+        assertEquals(1, countOccupiedInventorySlots(player), "chest merge occupied slots");
+        helper.succeed();
+    }
+
+    @GameTest(name = "item_handler_merges_exact_stack_without_loss")
+    public static void itemHandlerMergesExactStackWithoutLoss(GameTestHelper helper) {
+        ItemStackHandler handler = new ItemStackHandler(1);
+        handler.setStackInSlot(0, exactStack(Items.OAK_PLANKS, 100_000));
+
+        ItemStack remainder = handler.insertItem(0, exactStack(Items.OAK_PLANKS, 250_000), false);
+
+        assertEquals(350_000, StackCounts.get(handler.getStackInSlot(0)), "item-handler merged count");
+        assertEquals(0, StackCounts.get(remainder), "item-handler insertion remainder");
+        helper.succeed();
+    }
+
+    @GameTest(name = "item_handler_extracts_one_from_exact_stack")
+    public static void itemHandlerExtractsOneFromExactStack(GameTestHelper helper) {
+        ItemStackHandler handler = new ItemStackHandler(1);
+        handler.setStackInSlot(0, exactStack(Items.OAK_PLANKS, 250_000));
+
+        ItemStack extracted = handler.extractItem(0, 1, false);
+
+        assertEquals(1, StackCounts.get(extracted), "item-handler extracted count");
+        assertEquals(249_999, StackCounts.get(handler.getStackInSlot(0)), "item-handler extraction remainder");
+        helper.succeed();
+    }
+
+    @GameTest(name = "item_handler_simulation_preserves_exact_state")
+    public static void itemHandlerSimulationPreservesExactState(GameTestHelper helper) {
+        ItemStackHandler handler = new ItemStackHandler(1);
+        handler.setStackInSlot(0, exactStack(Items.OAK_PLANKS, 100_000));
+
+        ItemStack insertionRemainder = handler.insertItem(0, exactStack(Items.OAK_PLANKS, 250_000), true);
+        ItemStack simulatedExtraction = handler.extractItem(0, 75_000, true);
+
+        assertEquals(0, StackCounts.get(insertionRemainder), "simulated insertion remainder");
+        assertEquals(75_000, StackCounts.get(simulatedExtraction), "simulated extraction count");
+        assertEquals(100_000, StackCounts.get(handler.getStackInSlot(0)), "simulated handler state");
         helper.succeed();
     }
 
@@ -426,6 +710,45 @@ public final class StackCountGameTests {
             }
         }
         return total;
+    }
+
+    private static ItemStack exactStack(Item item, long count) {
+        ItemStack stack = new ItemStack(item);
+        StackCounts.set(stack, count);
+        return stack;
+    }
+
+    private static void assertStack(Item item, long count, ItemStack stack, String subject) {
+        if (!stack.is(item)) {
+            throw new GameTestAssertException(
+                    Component.literal(subject + ": expected " + item + ", got " + stack.getItem()),
+                    0
+            );
+        }
+        assertEquals(count, StackCounts.get(stack), subject + " count");
+    }
+
+    private static void dragAcross(ServerPlayer player, int type, int... slots) {
+        player.inventoryMenu.clicked(
+                AbstractContainerMenu.SLOT_CLICKED_OUTSIDE,
+                AbstractContainerMenu.getQuickcraftMask(AbstractContainerMenu.QUICKCRAFT_HEADER_START, type),
+                ContainerInput.QUICK_CRAFT,
+                player
+        );
+        for (int slot : slots) {
+            player.inventoryMenu.clicked(
+                    slot,
+                    AbstractContainerMenu.getQuickcraftMask(AbstractContainerMenu.QUICKCRAFT_HEADER_CONTINUE, type),
+                    ContainerInput.QUICK_CRAFT,
+                    player
+            );
+        }
+        player.inventoryMenu.clicked(
+                AbstractContainerMenu.SLOT_CLICKED_OUTSIDE,
+                AbstractContainerMenu.getQuickcraftMask(AbstractContainerMenu.QUICKCRAFT_HEADER_END, type),
+                ContainerInput.QUICK_CRAFT,
+                player
+        );
     }
 
     private static void assertEquals(long expected, long actual, String subject) {
