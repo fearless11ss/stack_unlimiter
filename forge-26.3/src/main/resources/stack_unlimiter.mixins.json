@@ -15,6 +15,7 @@
     "StackedContentsMixin"
   ],
   "client": [
+    "AbstractContainerScreenMixin",
     "GuiGraphicsMixin"
   ],
   "injectors": {

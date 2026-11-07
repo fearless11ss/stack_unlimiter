@@ -366,6 +366,20 @@ public final class StackCountGameTests {
         helper.succeed();
     }
 
+    @GameTest(name = "inventory_drag_preview_uses_exact_stack_count")
+    public static void inventoryDragPreviewUsesExactStackCount(GameTestHelper helper) {
+        ItemStack carried = exactStack(Items.OAK_PLANKS, 1_000_000);
+
+        int previewCount = AbstractContainerMenu.getQuickCraftPlaceCount(
+                18,
+                AbstractContainerMenu.QUICKCRAFT_TYPE_CHARITABLE,
+                carried
+        );
+
+        assertEquals(55_555, previewCount, "primary drag preview count");
+        helper.succeed();
+    }
+
     @GameTest(name = "inventory_secondary_drag_places_one_per_slot")
     public static void inventorySecondaryDragPlacesOnePerSlot(GameTestHelper helper) {
         ServerPlayer player = createPlayer(helper, "stack-unlimiter-one-drag-test");

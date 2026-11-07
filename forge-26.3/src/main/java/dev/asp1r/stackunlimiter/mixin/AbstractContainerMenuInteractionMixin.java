@@ -28,6 +28,27 @@ public abstract class AbstractContainerMenuInteractionMixin {
     @Unique
     private final Set<Integer> stackUnlimiter$exactQuickCraftSlots = new LinkedHashSet<>();
 
+    @Inject(method = "getQuickCraftPlaceCount", at = @At("HEAD"), cancellable = true)
+    private static void stackUnlimiter$getExactQuickCraftPlaceCount(
+            int slotCount,
+            int quickCraftType,
+            ItemStack carried,
+            CallbackInfoReturnable<Integer> callback
+    ) {
+        long exactCount = StackCounts.get(carried);
+        if (slotCount <= 0 || exactCount <= carried.getCount()) {
+            return;
+        }
+
+        long placeCount = switch (quickCraftType) {
+            case AbstractContainerMenu.QUICKCRAFT_TYPE_CHARITABLE -> exactCount / slotCount;
+            case AbstractContainerMenu.QUICKCRAFT_TYPE_GREEDY -> 1;
+            case AbstractContainerMenu.QUICKCRAFT_TYPE_CLONE -> carried.getMaxStackSize();
+            default -> exactCount;
+        };
+        callback.setReturnValue((int) Math.min(placeCount, Integer.MAX_VALUE));
+    }
+
     @Inject(method = "clicked", at = @At("HEAD"), cancellable = true)
     private void stackUnlimiter$handleExactStackClick(
             int slotIndex,
