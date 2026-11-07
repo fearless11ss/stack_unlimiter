@@ -15,14 +15,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = AbstractContainerMenu.class, remap = false)
 public abstract class AbstractContainerMenuInteractionMixin {
     @Inject(method = "clicked", at = @At("HEAD"), cancellable = true)
-    private void stackUnlimiter$dropExactStackOnce(
+    private void stackUnlimiter$handleExactStackClick(
             int slotIndex,
             int buttonNum,
             ContainerInput containerInput,
             Player player,
             CallbackInfo callback
     ) {
-        if (containerInput != ContainerInput.THROW || buttonNum != 1 || slotIndex < 0) {
+        if (slotIndex < 0) {
             return;
         }
 
@@ -35,6 +35,26 @@ public abstract class AbstractContainerMenuInteractionMixin {
         ItemStack source = slot.getItem();
         long exactCount = StackCounts.get(source);
         if (source.isEmpty() || exactCount <= source.getCount() || !slot.mayPickup(player)) {
+            return;
+        }
+
+        if (containerInput == ContainerInput.PICKUP && (buttonNum == 0 || buttonNum == 1)) {
+            long requested = buttonNum == 0
+                    ? exactCount
+                    : exactCount / 2 + exactCount % 2;
+            ItemStack carried = StackCounts.split(source, requested);
+            if (source.isEmpty()) {
+                slot.setByPlayer(ItemStack.EMPTY, carried);
+            } else {
+                slot.setChanged();
+            }
+            menu.setCarried(carried);
+            slot.onTake(player, carried);
+            callback.cancel();
+            return;
+        }
+
+        if (containerInput != ContainerInput.THROW || buttonNum != 1) {
             return;
         }
         if (!player.canDropItems()) {

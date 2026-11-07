@@ -196,6 +196,38 @@ public final class StackCountGameTests {
         helper.succeed();
     }
 
+    @GameTest(name = "inventory_right_click_splits_exactly_in_half")
+    public static void inventoryRightClickSplitsExactlyInHalf(GameTestHelper helper) {
+        ServerPlayer player = createPlayer(helper, "stack-unlimiter-menu-split-test");
+        player.getInventory().clearContent();
+
+        ItemStack planks = new ItemStack(Items.OAK_PLANKS);
+        StackCounts.set(planks, 250_000);
+        player.getInventory().setItem(0, planks);
+
+        player.inventoryMenu.clicked(36, 1, ContainerInput.PICKUP, player);
+
+        assertEquals(125_000, StackCounts.get(player.inventoryMenu.getCarried()), "right-click carried count");
+        assertEquals(125_000, StackCounts.get(player.getInventory().getItem(0)), "right-click remaining count");
+        helper.succeed();
+    }
+
+    @GameTest(name = "inventory_left_click_picks_up_entire_exact_stack")
+    public static void inventoryLeftClickPicksUpEntireExactStack(GameTestHelper helper) {
+        ServerPlayer player = createPlayer(helper, "stack-unlimiter-menu-pickup-test");
+        player.getInventory().clearContent();
+
+        ItemStack planks = new ItemStack(Items.OAK_PLANKS);
+        StackCounts.set(planks, 250_000);
+        player.getInventory().setItem(0, planks);
+
+        player.inventoryMenu.clicked(36, 0, ContainerInput.PICKUP, player);
+
+        assertEquals(250_000, StackCounts.get(player.inventoryMenu.getCarried()), "left-click carried count");
+        assertEquals(0, StackCounts.get(player.getInventory().getItem(0)), "left-click remaining count");
+        helper.succeed();
+    }
+
     @GameTest(name = "oversized_item_entity_pickup_preserves_exact_count")
     public static void oversizedItemEntityPickupPreservesExactCount(GameTestHelper helper) {
         ServerPlayer player = createPlayer(helper, "stack-unlimiter-pickup-test");
