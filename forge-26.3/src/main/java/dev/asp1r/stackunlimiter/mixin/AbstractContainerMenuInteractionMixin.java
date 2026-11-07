@@ -246,7 +246,8 @@ public abstract class AbstractContainerMenuInteractionMixin {
         if (slotIndex < 0
                 || !menu.isValidSlotIndex(slotIndex)
                 || carried.isEmpty()
-                || StackCounts.get(carried) <= carried.getCount()) {
+                || !StackCounts.isEligible(carried)
+                || !stackUnlimiter$hasExactPickupAllTarget(menu, carried, player)) {
             return false;
         }
 
@@ -278,6 +279,25 @@ public abstract class AbstractContainerMenuInteractionMixin {
         }
         menu.setCarried(carried);
         return true;
+    }
+
+    @Unique
+    private static boolean stackUnlimiter$hasExactPickupAllTarget(
+            AbstractContainerMenu menu,
+            ItemStack carried,
+            Player player
+    ) {
+        for (Slot targetSlot : menu.slots) {
+            ItemStack target = targetSlot.getItem();
+            if (!target.isEmpty()
+                    && StackCounts.get(target) > target.getCount()
+                    && targetSlot.mayPickup(player)
+                    && menu.canTakeItemForPickAll(carried, targetSlot)
+                    && StackCounts.sameItemSameComponents(target, carried)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Unique

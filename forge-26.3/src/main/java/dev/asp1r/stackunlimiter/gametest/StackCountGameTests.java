@@ -352,6 +352,24 @@ public final class StackCountGameTests {
         helper.succeed();
     }
 
+    @GameTest(name = "inventory_pickup_all_from_single_item_collects_all_exact_stacks")
+    public static void inventoryPickupAllFromSingleItemCollectsAllExactStacks(GameTestHelper helper) {
+        ServerPlayer player = createPlayer(helper, "stack-unlimiter-single-pickup-all-test");
+        player.getInventory().clearContent();
+        for (int slot = 9; slot < 18; slot++) {
+            player.getInventory().setItem(slot, exactStack(Items.OAK_PLANKS, 1_111_111));
+        }
+        player.inventoryMenu.setCarried(exactStack(Items.OAK_PLANKS, 1));
+
+        player.inventoryMenu.clicked(38, 0, ContainerInput.PICKUP_ALL, player);
+
+        assertEquals(10_000_000, StackCounts.get(player.inventoryMenu.getCarried()),
+                "pickup-all carried total from a single item");
+        assertEquals(0, countInventoryItem(player, Items.OAK_PLANKS),
+                "pickup-all inventory remainder from a single item");
+        helper.succeed();
+    }
+
     @GameTest(name = "inventory_primary_drag_evenly_distributes_exact_stack")
     public static void inventoryPrimaryDragEvenlyDistributesExactStack(GameTestHelper helper) {
         ServerPlayer player = createPlayer(helper, "stack-unlimiter-even-drag-test");
