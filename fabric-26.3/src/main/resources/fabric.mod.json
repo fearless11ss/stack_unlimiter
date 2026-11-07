@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${mod_version}",
+  "name": "${mod_name}",
+  "description": "${mod_description}",
+  "authors": [
+    "asp1r"
+  ],
+  "contact": {
+    "issues": "https://github.com/fearless11ss/stack_unlimiter/issues",
+    "sources": "https://github.com/fearless11ss/stack_unlimiter"
+  },
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "dev.asp1r.stackunlimiter.StackUnlimiter"
+    ]
+  },
+  "mixins": [
+    "stack_unlimiter.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "minecraft": "=${minecraft_version}",
+    "java": ">=25"
+  }
+}

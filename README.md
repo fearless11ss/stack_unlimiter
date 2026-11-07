@@ -1,34 +1,67 @@
 # Stack Unlimiter
 
-Experimental Minecraft Forge 1.20.1 mod that stores stack counts as signed 64-bit values while preserving the vanilla `int` API as a compatibility facade.
+Stack Unlimiter removes the practical stack-size limit for normally stackable
+items while keeping intentionally non-stackable items non-stackable. Exact
+counts are stored as signed 64-bit values and synchronized between the client
+and server.
 
-## Current status
+The mod must be installed on both sides. Worlds containing oversized stacks
+depend on the mod and should be backed up before installation or updates.
 
-This is an early vertical slice, not a release-ready mod. It currently provides:
+## Available builds
 
-- an exact-count API (`StackCounts`);
-- checked long arithmetic;
-- `ItemStack` copy, split, grow, shrink, save, load, and comparison hooks;
-- exact-count transport inside the existing item packet NBT shape;
-- raised base `Slot` and Forge `ItemStackHandler` limits;
-- single-stack insertion for eligible items created with `/give`;
-- vanilla crafting recipes accept oversized ingredient stacks;
-- recipe-book placement returns ingredients to an existing compatible stack instead of scattering them across free slots;
-- Shift-click recipe placement uses all available oversized ingredients instead of counting only 64;
-- Shift-clicking a crafting result processes compatible recipes in one bulk operation instead of crafting items one by one;
-- compact, slot-width-limited count labels such as `2K` for `2004` items.
+| Source directory | Minecraft | Mod loader | Mod version | Java |
+| --- | --- | --- | --- | --- |
+| [`forge-1.20.1`](forge-1.20.1/) | 1.20.1 | Forge | 0.1.7 | 17 |
+| [`forge-26.3`](forge-26.3/) | 26.3 | Forge | 0.1.8 | 25 |
+| [`fabric-26.3`](fabric-26.3/) | 26.3 | Fabric | 0.1.8 | 25 |
 
-Further inventory and menu interactions, item entities, complex crafting interactions, other command paths, mod compatibility adapters, and migration safety still require dedicated integration tests and additional patches.
-
-Both client and server must install exactly compatible versions. Worlds containing extended stacks must not be opened without the mod.
-
-Every completed change increments the mod version. Published artifact versions do not use pre-release suffixes such as `alpha`.
+Every directory is an independent Gradle module with its own wrapper,
+dependencies, source files, resources, unit tests, and integration tests. Run
+Gradle from the directory for the exact Minecraft and loader pair you want.
 
 ## Build
 
-Use Java 17:
+On Windows:
 
 ```powershell
-$env:JAVA_HOME='C:\Program Files\Microsoft\jdk-17.0.21.21-hotspot'
-.\gradlew.bat build
+cd forge-1.20.1
+.\gradlew.bat clean build
+
+cd ..\forge-26.3
+.\gradlew.bat clean build
+
+cd ..\fabric-26.3
+.\gradlew.bat clean build
 ```
+
+On Linux or macOS, use `./gradlew` instead. The resulting JAR is written to the
+selected module's `build/libs` directory.
+
+Fabric 26.3 requires the Gradle process itself to run on Java 25. Forge 26.3
+uses a Java 25 toolchain. Forge 1.20.1 uses Java 17.
+
+## Implemented behavior
+
+- exact oversized counts survive saving, loading, and network synchronization;
+- `/give` combines eligible items into one stack;
+- player inventory insertion and compatible slot transfers merge oversized
+  stacks;
+- recipe accounting sees the exact ingredient count;
+- recipe-book Shift-click placement distributes all available ingredients;
+- compatible Shift-click crafting operations are processed in bulk;
+- large count labels are compacted and scaled to remain inside the slot; and
+- items whose normal maximum is one remain non-stackable.
+
+## Compatibility
+
+Stack Unlimiter changes a core Minecraft invariant, so compatibility with every
+mod is not possible. Custom inventories, menus, crafting systems, or transfer
+implementations may retain their own limits or require dedicated adapters.
+
+Report reproducible problems through
+[GitHub Issues](https://github.com/fearless11ss/stack_unlimiter/issues).
+
+## License
+
+Stack Unlimiter is distributed under the [MIT License](LICENSE.txt).

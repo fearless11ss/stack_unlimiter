@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "stack_unlimiter:shift_crafting_collects_all_results",
+  "max_ticks": 100,
+  "structure": "forge:empty3x3x3"
+}

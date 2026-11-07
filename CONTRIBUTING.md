@@ -1,98 +1,96 @@
 # Contributing to Stack Unlimiter
 
-Thank you for helping improve Stack Unlimiter. Contributions can include bug
-reports, compatibility findings, documentation updates, tests, and code changes.
+Contributions can include bug reports, compatibility findings, documentation,
+tests, and code changes.
 
 ## Reporting bugs
 
-Use the repository's bug report form and provide as much of the following as
-possible:
+Use the repository's bug report form and include:
 
-- the exact Stack Unlimiter, Minecraft, and Forge versions;
+- the exact Stack Unlimiter, Minecraft, and mod-loader versions;
+- the source directory or downloaded file you tested;
 - whether the problem occurs in singleplayer, on a dedicated server, or both;
-- the smallest reliable sequence of steps that reproduces the problem;
-- the expected and actual behavior;
-- relevant logs, crash reports, screenshots, or videos;
-- a list of other installed mods; and
-- whether the problem still occurs with only Forge and Stack Unlimiter installed.
+- the smallest reliable reproduction sequence;
+- expected and actual behavior;
+- relevant logs, crash reports, screenshots, or videos; and
+- the installed mod list and a result with only required dependencies.
 
-Search existing issues before opening a new one. Back up affected worlds before
-reproducing inventory or serialization problems.
+Search existing issues first and back up affected worlds before reproducing
+inventory or serialization problems.
 
-## Suggesting changes
+## Repository layout
 
-Open an issue before starting a large feature or architectural change. Describe
-the use case, expected behavior, compatibility impact, and any changes required
-to saved worlds or network data. Small fixes and documentation improvements may
-be submitted directly as pull requests.
+Each supported Minecraft and loader pair is an independent Gradle module:
+
+- `forge-1.20.1`
+- `forge-26.3`
+- `fabric-26.3`
+
+Make changes only in the module they target. When a fix applies to more than one
+module, port and test it separately in every affected directory. Do not assume
+that mixin targets or loader hooks are interchangeable between versions.
 
 ## Development setup
 
-1. Install the JDK version required by the current Forge toolchain.
+1. Install the Java version listed for the target in the root README.
 2. Fork and clone the repository.
-3. Check `gradle.properties` for the currently targeted Minecraft and Forge
-   versions.
-4. Import the Gradle project into your IDE.
-5. Generate or refresh IDE run configurations when required by your setup.
+3. Change into the target module directory.
+4. Import that directory as a Gradle project in the IDE.
+5. Generate or refresh run configurations when required.
 
-On Windows, use `gradlew.bat`. On Linux and macOS, use `./gradlew`.
-
-Useful commands:
+Useful commands for Forge modules:
 
 ```text
-./gradlew build
+./gradlew clean build
 ./gradlew runClient
 ./gradlew runServer
 ./gradlew runGameTestServer
 ```
 
+Useful commands for the Fabric module:
+
+```text
+./gradlew clean build
+./gradlew runClient
+./gradlew runServer
+./gradlew runGameTest
+```
+
+On Windows, use `gradlew.bat` instead of `./gradlew`.
+
 ## Implementation requirements
 
-Changes to stack behavior should preserve the core guarantees of the project:
+Changes to stack behavior must preserve these guarantees:
 
-- exact oversized counts are stored without silently truncating them to vanilla
-  limits;
-- items that are intentionally non-stackable remain non-stackable;
-- client and server behavior stays synchronized;
-- saving, loading, commands, menus, crafting, and item transfers do not create
-  or delete items;
+- exact oversized counts are never silently truncated;
+- intentionally non-stackable items remain non-stackable;
+- client and server behavior remains synchronized;
+- saving, loading, commands, menus, crafting, and transfers do not create or
+  delete items;
 - vanilla-sized stacks continue to behave normally; and
 - unsupported modded behavior falls back safely whenever possible.
 
-Prefer focused mixins with narrowly defined injection points. Document unusual
-compatibility decisions and avoid broad changes that affect unrelated vanilla
-behavior.
+Prefer focused mixins with narrow injection points. Document compatibility
+decisions and avoid broad changes to unrelated vanilla behavior.
 
 ## Testing
 
 Before submitting a pull request:
 
-1. Run `./gradlew build`.
-2. Run `./gradlew runGameTestServer` for changes that affect game behavior.
+1. Run `clean build` inside every modified module.
+2. Run the module's GameTest task for changes affecting game behavior.
 3. Test both singleplayer and dedicated-server behavior when networking,
    inventories, menus, or synchronization are involved.
-4. Test with counts above vanilla limits and near important numeric boundaries.
+4. Test counts above vanilla limits and near important numeric boundaries.
 5. Confirm that no item duplication or item loss occurs.
 
-Add or update automated tests for every reproducible bug fix when practical.
-Include manual testing steps in the pull request description.
-
-## Pull requests
-
-Keep each pull request focused on one change. The description should explain:
-
-- what changed and why;
-- how the change was tested;
-- any known limitations or compatibility risks; and
-- whether saved-world or network compatibility is affected.
+Add or update automated tests for reproducible fixes when practical. Include
+manual testing steps and known limitations in the pull request description.
 
 Do not include generated build output, game directories, logs, credentials, or
-unrelated formatting changes. Write clear commit messages that describe the
-purpose of the change.
-
-If generative AI assisted with a contribution, disclose that use in the pull
-request. Contributors remain responsible for reviewing, understanding, testing,
-and having the right to submit every part of their contribution.
+unrelated formatting changes. If generative AI assisted with a contribution,
+disclose that use in the pull request. Contributors remain responsible for
+reviewing and understanding their changes.
 
 ## License
 

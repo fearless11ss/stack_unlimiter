@@ -1,0 +1,22 @@
+{
+  "required": true,
+  "minVersion": "0.8.7",
+  "package": "dev.asp1r.stackunlimiter.mixin",
+  "mixins": [
+    "AbstractCraftingMenuAccessor",
+    "GiveCommandMixin",
+    "InventoryMixin",
+    "InventoryMenuMixin",
+    "ItemStackHandlerMixin",
+    "ItemStackMixin",
+    "ServerPlaceRecipeMixin",
+    "SlotMixin",
+    "StackedContentsMixin"
+  ],
+  "client": [
+    "GuiGraphicsMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

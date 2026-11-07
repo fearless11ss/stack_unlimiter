@@ -27,11 +27,21 @@ body:
     validations:
       required: true
 
-  - type: input
-    id: forge-version
+  - type: dropdown
+    id: mod-loader
     attributes:
-      label: Forge version
-      placeholder: Enter the complete Forge version
+      label: Mod loader
+      options:
+        - Forge
+        - Fabric
+    validations:
+      required: true
+
+  - type: input
+    id: loader-version
+    attributes:
+      label: Mod-loader version
+      placeholder: Enter the complete Forge or Fabric Loader version
     validations:
       required: true
 
@@ -50,7 +60,7 @@ body:
     id: isolated
     attributes:
       label: Does the problem occur with only Stack Unlimiter installed?
-      description: Test with Forge and Stack Unlimiter only when possible.
+      description: Test with only the selected loader, required dependencies, and Stack Unlimiter when possible.
       options:
         - "Yes"
         - "No"

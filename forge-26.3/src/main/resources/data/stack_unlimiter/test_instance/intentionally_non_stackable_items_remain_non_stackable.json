@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "stack_unlimiter:intentionally_non_stackable_items_remain_non_stackable",
+  "max_ticks": 100,
+  "structure": "forge:empty3x3x3"
+}
