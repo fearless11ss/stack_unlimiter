@@ -40,7 +40,7 @@ updated: 2026-11-08
 | [[forge-1.20.1/gradle.properties|forge-1.20.1]] | 1.20.1 | Forge | 17 | `0.1.11` | [[RELEASE_CHANGELOGS#Forge 1.20.1 — 0.1.11|0.1.11]] | активно тестируется |
 | [[forge-26.3/gradle.properties|forge-26.3]] | 26.3 | Forge | 25 | `0.1.16` | [[RELEASE_CHANGELOGS#Forge 26.3 — 0.1.16|0.1.16]] | активно тестируется |
 | [[fabric-26.3/gradle.properties|fabric-26.3]] | 26.3 | Fabric | 25+ для Gradle | `0.1.9` | [[RELEASE_CHANGELOGS#Fabric 26.3 — 0.1.9|0.1.9]] | исправлена полная матрица vanilla-инвентаря |
-| [[neoforge-26.3/gradle.properties|neoforge-26.3]] | 26.3 | NeoForge | 25 | `0.1.9` | [[RELEASE_CHANGELOGS#NeoForge 26.3 — 0.1.9|0.1.9]] | сборка и все 34 обнаруженных GameTest проходят |
+| [[neoforge-26.3/gradle.properties|neoforge-26.3]] | 26.3 | NeoForge | 25 | `0.1.9` | [[RELEASE_CHANGELOGS#NeoForge 26.3 — 0.1.9|0.1.9]] | 34 GameTest проходят; файл загружен на Modrinth |
 
 > [!warning] Независимые реализации
 > Исправление в одном модуле не переносится автоматически в остальные. Перед портированием сравни `stack_unlimiter.mixins.json`, Minecraft API и набор GameTest конкретной пары.
@@ -229,6 +229,11 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 - Integration: [[neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java|StackCountGameTests]].
 - Подтверждённое состояние `0.1.9`: `test`, `clean build` и все 34 теста, обнаруженные `runGameTestServer`, проходят.
 - Результат: `neoforge-26.3/build/libs/`.
+
+### Публикация
+
+- Modrinth: `0.1.9` загружен как Release с display name `Stack Unlimiter 0.1.9 — NeoForge 26.3` и changelog из [[RELEASE_CHANGELOGS#NeoForge 26.3 — 0.1.9]].
+- CurseForge: используются те же display name, metadata и changelog; загрузка подготовлена.
 
 ## Диагностические маршруты
 
