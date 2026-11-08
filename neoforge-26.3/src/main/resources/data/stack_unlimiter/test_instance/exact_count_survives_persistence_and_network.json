@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "stack_unlimiter:exact_count_survives_persistence_and_network",
+  "max_ticks": 100,
+  "structure": "stack_unlimiter:empty"
+}

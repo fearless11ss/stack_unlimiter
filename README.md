@@ -15,6 +15,7 @@ depend on the mod and should be backed up before installation or updates.
 | [`forge-1.20.1`](forge-1.20.1/) | 1.20.1 | Forge | 0.1.11 | 17 |
 | [`forge-26.3`](forge-26.3/) | 26.3 | Forge | 0.1.16 | 25 |
 | [`fabric-26.3`](fabric-26.3/) | 26.3 | Fabric | 0.1.9 | 25 |
+| [`neoforge-26.3`](neoforge-26.3/) | 26.3 | NeoForge | 0.1.9 | 25 |
 
 Every directory is an independent Gradle module with its own wrapper,
 dependencies, source files, resources, unit tests, and integration tests. Run

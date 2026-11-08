@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "stack_unlimiter:chest_shift_click_merges_into_existing_exact_stack",
+  "max_ticks": 100,
+  "structure": "stack_unlimiter:empty"
+}

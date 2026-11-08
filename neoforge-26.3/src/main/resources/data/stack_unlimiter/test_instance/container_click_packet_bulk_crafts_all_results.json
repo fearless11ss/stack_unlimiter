@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "stack_unlimiter:container_click_packet_bulk_crafts_all_results",
+  "max_ticks": 100,
+  "structure": "stack_unlimiter:empty"
+}

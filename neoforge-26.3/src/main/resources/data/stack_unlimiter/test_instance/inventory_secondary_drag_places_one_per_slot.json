@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "stack_unlimiter:inventory_secondary_drag_places_one_per_slot",
+  "max_ticks": 100,
+  "structure": "stack_unlimiter:empty"
+}

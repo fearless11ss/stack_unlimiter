@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "stack_unlimiter:inventory_drag_preview_uses_exact_stack_count",
+  "max_ticks": 100,
+  "structure": "stack_unlimiter:empty"
+}

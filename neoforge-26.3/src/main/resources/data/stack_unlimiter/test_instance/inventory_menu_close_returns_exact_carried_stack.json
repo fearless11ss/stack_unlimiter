@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "stack_unlimiter:inventory_menu_close_returns_exact_carried_stack",
+  "max_ticks": 100,
+  "structure": "stack_unlimiter:empty"
+}

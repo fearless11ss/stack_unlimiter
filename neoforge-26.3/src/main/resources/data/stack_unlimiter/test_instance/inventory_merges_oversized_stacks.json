@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "stack_unlimiter:inventory_merges_oversized_stacks",
+  "max_ticks": 100,
+  "structure": "stack_unlimiter:empty"
+}

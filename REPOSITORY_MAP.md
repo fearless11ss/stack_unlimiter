@@ -28,6 +28,7 @@ updated: 2026-11-08
 - [[forge-1.20.1/gradle.properties|Forge 1.20.1 — версии и метаданные]]
 - [[forge-26.3/gradle.properties|Forge 26.3 — версии и метаданные]]
 - [[fabric-26.3/gradle.properties|Fabric 26.3 — версии и метаданные]]
+- [[neoforge-26.3/gradle.properties|NeoForge 26.3 — версии и метаданные]]
 
 ## Модули
 
@@ -38,6 +39,7 @@ updated: 2026-11-08
 | [[forge-1.20.1/gradle.properties|forge-1.20.1]] | 1.20.1 | Forge | 17 | `0.1.11` | активно тестируется |
 | [[forge-26.3/gradle.properties|forge-26.3]] | 26.3 | Forge | 25 | `0.1.16` | активно тестируется |
 | [[fabric-26.3/gradle.properties|fabric-26.3]] | 26.3 | Fabric | 25+ для Gradle | `0.1.9` | исправлена полная матрица vanilla-инвентаря |
+| [[neoforge-26.3/gradle.properties|neoforge-26.3]] | 26.3 | NeoForge | 25 | `0.1.9` | сборка и все 34 обнаруженных GameTest проходят |
 
 > [!warning] Независимые реализации
 > Исправление в одном модуле не переносится автоматически в остальные. Перед портированием сравни `stack_unlimiter.mixins.json`, Minecraft API и набор GameTest конкретной пары.
@@ -78,6 +80,7 @@ flowchart LR
 | Forge 1.20.1 | `@Unique long` в `ItemStackMixin` | [[forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/internal/LongCountNbt.java|LongCountNbt]] | [[forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/FriendlyByteBufMixin.java|FriendlyByteBufMixin]] добавляет временный exact-count в NBT пакета |
 | Forge 26.3 | `DataComponents.CUSTOM_DATA` | внутренний ключ в custom data | сериализация компонентов Minecraft |
 | Fabric 26.3 | `DataComponents.CUSTOM_DATA` | внутренний ключ в custom data | сериализация компонентов Minecraft |
+| NeoForge 26.3 | `DataComponents.CUSTOM_DATA` | внутренний ключ в custom data | сериализация компонентов Minecraft |
 
 ## Карта подсистем
 
@@ -90,7 +93,7 @@ flowchart LR
 | `/give` | `mixin/GiveCommandMixin` | один exact-стак вместо множества по 64 |
 | Крафт в инвентаре | `mixin/InventoryMenuMixin` | ингредиенты, результат, возврат остатков, bulk Shift-click |
 | Recipe book | `mixin/StackedContentsMixin`, `mixin/ServerPlaceRecipeMixin`, `mixin/AbstractCraftingMenuAccessor` | расчёт количества рецептов и распределение всех ингредиентов |
-| Forge item handlers | `mixin/ItemStackHandlerMixin` | insert/extract/simulate без потерь |
+| Loader-specific storage API | Forge: `mixin/ItemStackHandlerMixin`; NeoForge 26.3: legacy API отсутствует | insert/extract/simulate без потерь там, где loader предоставляет отдельный handler API |
 | Синхронизация меню | `ItemStack.matches`, сравнение remote slot, packet serialization | сервер изменился → клиент обязательно получил новый exact-count |
 | Отрисовка | `client/StackCountDisplay`, `mixin/GuiGraphicsMixin`, иногда `AbstractContainerScreenMixin` | `65`, `999`, `1K`, крупные значения и ширина подписи |
 | Интеграционные тесты | `gametest/StackCountGameTests` | полный игровой маршрут, не только изолированный метод |
@@ -189,6 +192,43 @@ cd fabric-26.3
 - Подтверждённое состояние `0.1.9`: `test`, `clean build` и все 34 теста, обнаруженные `runGameTest`, проходят.
 - Результат: `fabric-26.3/build/libs/`.
 
+## NeoForge 26.3
+
+### Точки входа
+
+- [[neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/StackUnlimiter.java|StackUnlimiter]] — NeoForge entry point и регистрация GameTest-функций через mod event bus.
+- [[neoforge-26.3/src/main/templates/META-INF/neoforge.mods.toml|neoforge.mods.toml]] — шаблон metadata; итоговый файл генерируется Gradle.
+- [[neoforge-26.3/src/main/resources/stack_unlimiter.mixins.json|Mixin config]].
+
+### Особенности ветки
+
+- Exact-count хранится в `DataComponents.CUSTOM_DATA`; модель и полный набор vanilla-инвентарных операций перенесены из исправленной реализации 26.3.
+- [[neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerMenuInteractionMixin.java|AbstractContainerMenuInteractionMixin]] обрабатывает ЛКМ, ПКМ, Shift-click, number key, double-click, drag и выброс без обрезания до `64`.
+- [[neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerScreenMixin.java|AbstractContainerScreenMixin]] использует exact-count в клиентском предпросмотре drag-распределения.
+- [[neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/internal/BulkCraftingDispatch.java|BulkCraftingDispatch]] координирует серверный массовый крафт.
+- [[neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/InventoryMenuMixin.java|InventoryMenuMixin]] устанавливает crafting player через `CommonHooks` и отправляет NeoForge crafting event через `EventHooks`, сохраняя совместимость bulk crafting с событиями loader.
+- В NeoForge 26.3 нет legacy Forge `ItemStackHandler`/`IItemHandler`, поэтому Forge-специфичный `ItemStackHandlerMixin` не переносится. Vanilla-инвентари и меню покрыты полностью.
+- [[neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/gametest/GameTestRegistry.java|GameTestRegistry]] регистрирует 33 функции через `DeferredRegister` в `BuiltInRegistries.TEST_FUNCTION`.
+- Data-driven описания находятся в `src/main/resources/data/stack_unlimiter/test_instance/`, а общая пустая структура — в [[neoforge-26.3/src/main/resources/data/stack_unlimiter/structure/empty.nbt|empty.nbt]].
+
+### Тесты и сборка
+
+Gradle запускается на Java 21, а Java 25 используется как toolchain компиляции. Это обходит несовместимость asset-задач NeoForge с запуском Gradle непосредственно на Java 25.
+
+```powershell
+cd neoforge-26.3
+$env:JAVA_HOME='C:\Program Files\Microsoft\jdk-21.0.13.21-hotspot'
+$env:Path="$env:JAVA_HOME\bin;$env:Path"
+.\gradlew.bat test '-Dorg.gradle.java.installations.paths=C:\Program Files\Microsoft\jdk-21.0.13.21-hotspot,C:\Users\asp1r\.gradle\jdks\eclipse_adoptium-25-amd64-windows.2'
+.\gradlew.bat runGameTestServer '-Dorg.gradle.java.installations.paths=C:\Program Files\Microsoft\jdk-21.0.13.21-hotspot,C:\Users\asp1r\.gradle\jdks\eclipse_adoptium-25-amd64-windows.2'
+.\gradlew.bat clean build '-Dorg.gradle.java.installations.paths=C:\Program Files\Microsoft\jdk-21.0.13.21-hotspot,C:\Users\asp1r\.gradle\jdks\eclipse_adoptium-25-amd64-windows.2'
+```
+
+- Unit: `src/test/java/dev/asp1r/stackunlimiter/`.
+- Integration: [[neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java|StackCountGameTests]].
+- Подтверждённое состояние `0.1.9`: `test`, `clean build` и все 34 теста, обнаруженные `runGameTestServer`, проходят.
+- Результат: `neoforge-26.3/build/libs/`.
+
 ## Диагностические маршруты
 
 ### Предмет подбирается, но цифра не меняется
@@ -207,7 +247,7 @@ cd fabric-26.3
 1. Найти первый вызов, где exact-count заменяется `getCount()`.
 2. Разделить источник, переносимый стак и остаток; проверить каждый exact-count.
 3. Проверить оба направления и пустой/совместимый целевой слот.
-4. Для Forge отдельно проверить `ItemStackHandler` и режим simulation.
+4. Для Forge отдельно проверить `ItemStackHandler` и режим simulation; в NeoForge 26.3 legacy handler API отсутствует.
 
 ### Дюп или потеря предметов
 
@@ -244,7 +284,7 @@ StackedContents → ServerPlaceRecipe → crafting grid → result slot → bulk
 - recipe book, обычный крафт и Shift-click результата;
 - сохранение/загрузка мира;
 - packet round-trip и реальная remote-slot синхронизация;
-- Forge item handler: insert, extract, simulate;
+- loader-specific storage handler: для Forge — insert, extract, simulate; для NeoForge 26.3 legacy Forge handler не применяется;
 - предмет с ванильным максимумом `1`.
 
 ## Рабочий цикл изменения

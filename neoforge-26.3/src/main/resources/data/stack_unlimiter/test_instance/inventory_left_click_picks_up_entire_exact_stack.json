@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "stack_unlimiter:inventory_left_click_picks_up_entire_exact_stack",
+  "max_ticks": 100,
+  "structure": "stack_unlimiter:empty"
+}

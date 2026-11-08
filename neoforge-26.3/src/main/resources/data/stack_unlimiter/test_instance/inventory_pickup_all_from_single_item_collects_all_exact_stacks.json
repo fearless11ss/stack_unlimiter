@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "stack_unlimiter:inventory_pickup_all_from_single_item_collects_all_exact_stacks",
+  "max_ticks": 100,
+  "structure": "stack_unlimiter:empty"
+}
