@@ -15,7 +15,10 @@ import net.minecraft.network.protocol.game.ClientboundContainerSetContentPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.StackedContents;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.InventoryMenu;
@@ -24,6 +27,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
+import net.minecraftforge.items.ItemStackHandler;
 
 import java.util.List;
 import java.util.UUID;
@@ -41,7 +45,7 @@ public final class StackCountGameTests {
         StackCounts.set(stack, initial);
 
         assertEquals(initial, StackCounts.get(stack), "exact count after set");
-        assertEquals(Integer.MAX_VALUE, stack.getCount(), "int compatibility facade");
+        assertEquals(64, stack.getCount(), "vanilla compatibility facade");
         assertEquals(Integer.MAX_VALUE, stack.getMaxStackSize(), "raised item maximum");
 
         stack.grow(25);
@@ -314,6 +318,244 @@ public final class StackCountGameTests {
         helper.succeed();
     }
 
+    @GameTest(templateNamespace = "minecraft", template = "empty")
+    public static void chestShiftClickMovesEntireOversizedStack(GameTestHelper helper) {
+        ServerPlayer player = stackUnlimiter$createPlayer(helper, "stack-unlimiter-chest-transfer-test");
+        player.getInventory().clearContent();
+        ItemStack planks = new ItemStack(Items.OAK_PLANKS);
+        StackCounts.set(planks, 100_000);
+        player.getInventory().setItem(0, planks);
+        SimpleContainer chest = new SimpleContainer(27);
+        ChestMenu menu = ChestMenu.threeRows(1, player.getInventory(), chest);
+
+        menu.clicked(54, 0, ClickType.QUICK_MOVE, player);
+
+        assertEquals(0, StackCounts.get(player.getInventory().getItem(0)),
+                "player inventory remainder after chest Shift-click");
+        assertEquals(100_000, StackCounts.get(chest.getItem(0)),
+                "chest stack after player Shift-click");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "minecraft", template = "empty")
+    public static void inventoryPrimaryAndSecondaryPickupUseExactCounts(GameTestHelper helper) {
+        ServerPlayer player = stackUnlimiter$createPlayer(helper, "stack-unlimiter-pickup-test");
+        player.getInventory().setItem(0, stackUnlimiter$exactStack(Items.OAK_PLANKS, 250_000));
+
+        player.inventoryMenu.clicked(36, 1, ClickType.PICKUP, player);
+        assertEquals(125_000, StackCounts.get(player.inventoryMenu.getCarried()), "right-click carried half");
+        assertEquals(125_000, StackCounts.get(player.getInventory().getItem(0)), "right-click source half");
+
+        player.inventoryMenu.setCarried(ItemStack.EMPTY);
+        player.inventoryMenu.clicked(36, 0, ClickType.PICKUP, player);
+        assertEquals(125_000, StackCounts.get(player.inventoryMenu.getCarried()), "left-click carried stack");
+        assertEquals(0, StackCounts.get(player.getInventory().getItem(0)), "left-click source remainder");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "minecraft", template = "empty")
+    public static void inventoryPlacesAndMergesExactCarriedStacks(GameTestHelper helper) {
+        ServerPlayer player = stackUnlimiter$createPlayer(helper, "stack-unlimiter-place-merge-test");
+        player.inventoryMenu.setCarried(stackUnlimiter$exactStack(Items.OAK_PLANKS, 250_000));
+
+        player.inventoryMenu.clicked(36, 1, ClickType.PICKUP, player);
+        assertEquals(1, StackCounts.get(player.getInventory().getItem(0)), "right-click placed count");
+        assertEquals(249_999, StackCounts.get(player.inventoryMenu.getCarried()), "right-click carried remainder");
+
+        player.inventoryMenu.clicked(36, 0, ClickType.PICKUP, player);
+        assertEquals(250_000, StackCounts.get(player.getInventory().getItem(0)), "left-click merged count");
+        assertEquals(0, StackCounts.get(player.inventoryMenu.getCarried()), "left-click carried remainder");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "minecraft", template = "empty")
+    public static void inventorySwapsDifferentExactStacks(GameTestHelper helper) {
+        ServerPlayer player = stackUnlimiter$createPlayer(helper, "stack-unlimiter-swap-test");
+        player.getInventory().setItem(0, stackUnlimiter$exactStack(Items.COBBLESTONE, 100_000));
+        player.inventoryMenu.setCarried(stackUnlimiter$exactStack(Items.OAK_PLANKS, 250_000));
+
+        player.inventoryMenu.clicked(36, 0, ClickType.PICKUP, player);
+
+        stackUnlimiter$assertStack(Items.OAK_PLANKS, 250_000, player.getInventory().getItem(0), "swapped slot");
+        stackUnlimiter$assertStack(Items.COBBLESTONE, 100_000, player.inventoryMenu.getCarried(), "swapped carried");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "minecraft", template = "empty")
+    public static void inventoryNumberKeySwapsExactStacks(GameTestHelper helper) {
+        ServerPlayer player = stackUnlimiter$createPlayer(helper, "stack-unlimiter-number-swap-test");
+        player.getInventory().setItem(0, stackUnlimiter$exactStack(Items.OAK_PLANKS, 250_000));
+        player.getInventory().setItem(9, stackUnlimiter$exactStack(Items.COBBLESTONE, 100_000));
+
+        player.inventoryMenu.clicked(9, 0, ClickType.SWAP, player);
+
+        stackUnlimiter$assertStack(Items.COBBLESTONE, 100_000, player.getInventory().getItem(0), "number-key hotbar");
+        stackUnlimiter$assertStack(Items.OAK_PLANKS, 250_000, player.getInventory().getItem(9), "number-key inventory");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "minecraft", template = "empty")
+    public static void inventoryPickupAllCollectsExactStacks(GameTestHelper helper) {
+        ServerPlayer player = stackUnlimiter$createPlayer(helper, "stack-unlimiter-pickup-all-test");
+        for (int slot = 9; slot < 18; slot++) {
+            player.getInventory().setItem(slot, stackUnlimiter$exactStack(Items.OAK_PLANKS, 1_111_111));
+        }
+        player.inventoryMenu.setCarried(stackUnlimiter$exactStack(Items.OAK_PLANKS, 1));
+
+        player.inventoryMenu.clicked(38, 0, ClickType.PICKUP_ALL, player);
+
+        assertEquals(10_000_000, StackCounts.get(player.inventoryMenu.getCarried()), "pickup-all carried total");
+        assertEquals(0, stackUnlimiter$countInventoryItem(player, Items.OAK_PLANKS), "pickup-all remainder");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "minecraft", template = "empty")
+    public static void inventoryPrimaryDragDistributesExactStack(GameTestHelper helper) {
+        ServerPlayer player = stackUnlimiter$createPlayer(helper, "stack-unlimiter-primary-drag-test");
+        player.inventoryMenu.setCarried(stackUnlimiter$exactStack(Items.OAK_PLANKS, 250_001));
+
+        stackUnlimiter$dragAcross(player, 0, 36, 37);
+
+        assertEquals(125_000, StackCounts.get(player.getInventory().getItem(0)), "primary drag first slot");
+        assertEquals(125_000, StackCounts.get(player.getInventory().getItem(1)), "primary drag second slot");
+        assertEquals(1, StackCounts.get(player.inventoryMenu.getCarried()), "primary drag remainder");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "minecraft", template = "empty")
+    public static void inventorySecondaryDragPlacesOnePerSlot(GameTestHelper helper) {
+        ServerPlayer player = stackUnlimiter$createPlayer(helper, "stack-unlimiter-secondary-drag-test");
+        player.inventoryMenu.setCarried(stackUnlimiter$exactStack(Items.OAK_PLANKS, 250_000));
+
+        stackUnlimiter$dragAcross(player, 1, 36, 37, 38);
+
+        assertEquals(1, StackCounts.get(player.getInventory().getItem(0)), "secondary drag first slot");
+        assertEquals(1, StackCounts.get(player.getInventory().getItem(1)), "secondary drag second slot");
+        assertEquals(1, StackCounts.get(player.getInventory().getItem(2)), "secondary drag third slot");
+        assertEquals(249_997, StackCounts.get(player.inventoryMenu.getCarried()), "secondary drag remainder");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "minecraft", template = "empty")
+    public static void chestShiftClickMovesAndMergesExactStacksToPlayer(GameTestHelper helper) {
+        ServerPlayer player = stackUnlimiter$createPlayer(helper, "stack-unlimiter-chest-player-test");
+        player.getInventory().setItem(0, stackUnlimiter$exactStack(Items.OAK_PLANKS, 100_000));
+        SimpleContainer chest = new SimpleContainer(27);
+        chest.setItem(0, stackUnlimiter$exactStack(Items.OAK_PLANKS, 250_000));
+        ChestMenu menu = ChestMenu.threeRows(1, player.getInventory(), chest);
+
+        menu.clicked(0, 0, ClickType.QUICK_MOVE, player);
+
+        assertEquals(0, StackCounts.get(chest.getItem(0)), "chest source remainder");
+        assertEquals(350_000, stackUnlimiter$countInventoryItem(player, Items.OAK_PLANKS), "merged player total");
+        assertEquals(1, stackUnlimiter$countOccupiedInventorySlots(player), "merged player slots");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "minecraft", template = "empty")
+    public static void inventoryOutsideClicksDropExactAmounts(GameTestHelper helper) {
+        ServerPlayer player = stackUnlimiter$createPlayer(helper, "stack-unlimiter-outside-drop-test");
+        player.inventoryMenu.setCarried(stackUnlimiter$exactStack(Items.OAK_PLANKS, 250_000));
+
+        player.inventoryMenu.clicked(
+                AbstractContainerMenu.SLOT_CLICKED_OUTSIDE,
+                1,
+                ClickType.PICKUP,
+                player
+        );
+        assertEquals(249_999, StackCounts.get(player.inventoryMenu.getCarried()),
+                "right outside-click carried remainder");
+
+        player.inventoryMenu.clicked(
+                AbstractContainerMenu.SLOT_CLICKED_OUTSIDE,
+                0,
+                ClickType.PICKUP,
+                player
+        );
+        assertEquals(0, StackCounts.get(player.inventoryMenu.getCarried()),
+                "left outside-click carried remainder");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "minecraft", template = "empty")
+    public static void inventoryThrowKeyDropsOneThenEntireExactStack(GameTestHelper helper) {
+        ServerPlayer player = stackUnlimiter$createPlayer(helper, "stack-unlimiter-throw-test");
+        player.getInventory().setItem(0, stackUnlimiter$exactStack(Items.OAK_PLANKS, 250_000));
+
+        player.inventoryMenu.clicked(36, 0, ClickType.THROW, player);
+        assertEquals(249_999, StackCounts.get(player.getInventory().getItem(0)),
+                "single-item throw remainder");
+
+        player.inventoryMenu.clicked(36, 1, ClickType.THROW, player);
+        assertEquals(0, StackCounts.get(player.getInventory().getItem(0)),
+                "full-stack throw remainder");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "minecraft", template = "empty")
+    public static void closingContainerReturnsExactCarriedStack(GameTestHelper helper) {
+        ServerPlayer player = stackUnlimiter$createPlayer(helper, "stack-unlimiter-close-menu-test");
+        SimpleContainer chest = new SimpleContainer(27);
+        ChestMenu menu = ChestMenu.threeRows(1, player.getInventory(), chest);
+        menu.setCarried(stackUnlimiter$exactStack(Items.OAK_PLANKS, 250_000));
+
+        menu.removed(player);
+
+        assertEquals(250_000, stackUnlimiter$countInventoryItem(player, Items.OAK_PLANKS),
+                "returned carried total");
+        assertEquals(0, StackCounts.get(menu.getCarried()), "carried stack after close");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "minecraft", template = "empty")
+    public static void forgeItemHandlerPreservesExactInsertMergeAndExtract(GameTestHelper helper) {
+        ItemStackHandler handler = new ItemStackHandler(1);
+        ItemStack first = stackUnlimiter$exactStack(Items.OAK_PLANKS, 250_000);
+
+        ItemStack simulatedRemainder = handler.insertItem(0, first, true);
+        assertEquals(0, StackCounts.get(simulatedRemainder), "simulated insertion remainder");
+        assertEquals(0, StackCounts.get(handler.getStackInSlot(0)), "simulated insertion contents");
+
+        ItemStack remainder = handler.insertItem(0, first, false);
+        assertEquals(0, StackCounts.get(remainder), "insertion remainder");
+        assertEquals(250_000, StackCounts.get(handler.getStackInSlot(0)), "inserted contents");
+
+        handler.insertItem(0, stackUnlimiter$exactStack(Items.OAK_PLANKS, 100_000), false);
+        assertEquals(350_000, StackCounts.get(handler.getStackInSlot(0)), "merged contents");
+
+        ItemStack simulatedExtract = handler.extractItem(0, 100_000, true);
+        assertEquals(100_000, StackCounts.get(simulatedExtract), "simulated extraction result");
+        assertEquals(350_000, StackCounts.get(handler.getStackInSlot(0)), "simulated extraction contents");
+
+        ItemStack extracted = handler.extractItem(0, 100_000, false);
+        assertEquals(100_000, StackCounts.get(extracted), "extraction result");
+        assertEquals(250_000, StackCounts.get(handler.getStackInSlot(0)), "extraction remainder");
+
+        ItemStackHandler loaded = new ItemStackHandler();
+        loaded.deserializeNBT(handler.serializeNBT());
+        assertEquals(250_000, StackCounts.get(loaded.getStackInSlot(0)), "handler NBT round trip");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "minecraft", template = "empty")
+    public static void nonStackableItemsRemainNonStackable(GameTestHelper helper) {
+        ItemStack sword = new ItemStack(Items.DIAMOND_SWORD);
+        assertEquals(1, sword.getMaxStackSize(), "non-stackable item maximum");
+        assertEquals(1, StackCounts.get(sword), "non-stackable exact count");
+
+        boolean rejected = false;
+        try {
+            StackCounts.set(sword, 2);
+        } catch (IllegalArgumentException expected) {
+            rejected = true;
+        }
+        if (!rejected) {
+            throw new GameTestAssertException("non-stackable item accepted an oversized count");
+        }
+        assertEquals(1, StackCounts.get(sword), "non-stackable count after rejection");
+        helper.succeed();
+    }
+
     private static ClientboundContainerSetContentPacket stackUnlimiter$roundTripMenu(
             InventoryMenu menu
     ) {
@@ -336,6 +578,74 @@ public final class StackCountGameTests {
             }
         }
         return occupied;
+    }
+
+    private static ServerPlayer stackUnlimiter$createPlayer(GameTestHelper helper, String name) {
+        ServerPlayer player = new ServerPlayer(
+                helper.getLevel().getServer(),
+                helper.getLevel(),
+                new GameProfile(UUID.randomUUID(), name)
+        );
+        Connection connection = new Connection(PacketFlow.SERVERBOUND);
+        player.connection = new ServerGamePacketListenerImpl(
+                helper.getLevel().getServer(),
+                connection,
+                player
+        );
+        connection.setListener(player.connection);
+        player.getInventory().clearContent();
+        return player;
+    }
+
+    private static ItemStack stackUnlimiter$exactStack(net.minecraft.world.item.Item item, long count) {
+        ItemStack stack = new ItemStack(item);
+        StackCounts.set(stack, count);
+        return stack;
+    }
+
+    private static void stackUnlimiter$assertStack(
+            net.minecraft.world.item.Item item,
+            long count,
+            ItemStack stack,
+            String subject
+    ) {
+        if (!stack.is(item)) {
+            throw new GameTestAssertException(subject + ": expected " + item + ", got " + stack.getItem());
+        }
+        assertEquals(count, StackCounts.get(stack), subject + " count");
+    }
+
+    private static int stackUnlimiter$countOccupiedInventorySlots(ServerPlayer player) {
+        int occupied = 0;
+        for (ItemStack stack : player.getInventory().items) {
+            if (!stack.isEmpty()) {
+                occupied++;
+            }
+        }
+        return occupied;
+    }
+
+    private static void stackUnlimiter$dragAcross(ServerPlayer player, int type, int... slots) {
+        player.inventoryMenu.clicked(
+                AbstractContainerMenu.SLOT_CLICKED_OUTSIDE,
+                AbstractContainerMenu.getQuickcraftMask(0, type),
+                ClickType.QUICK_CRAFT,
+                player
+        );
+        for (int slot : slots) {
+            player.inventoryMenu.clicked(
+                    slot,
+                    AbstractContainerMenu.getQuickcraftMask(1, type),
+                    ClickType.QUICK_CRAFT,
+                    player
+            );
+        }
+        player.inventoryMenu.clicked(
+                AbstractContainerMenu.SLOT_CLICKED_OUTSIDE,
+                AbstractContainerMenu.getQuickcraftMask(2, type),
+                ClickType.QUICK_CRAFT,
+                player
+        );
     }
 
     private static long stackUnlimiter$countInventoryItem(

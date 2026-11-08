@@ -12,7 +12,7 @@ depend on the mod and should be backed up before installation or updates.
 
 | Source directory | Minecraft | Mod loader | Mod version | Java |
 | --- | --- | --- | --- | --- |
-| [`forge-1.20.1`](forge-1.20.1/) | 1.20.1 | Forge | 0.1.7 | 17 |
+| [`forge-1.20.1`](forge-1.20.1/) | 1.20.1 | Forge | 0.1.8 | 17 |
 | [`forge-26.3`](forge-26.3/) | 26.3 | Forge | 0.1.16 | 25 |
 | [`fabric-26.3`](fabric-26.3/) | 26.3 | Fabric | 0.1.8 | 25 |
 

@@ -64,7 +64,7 @@ public abstract class ItemStackMixin implements LongCountAccess {
     @Inject(method = "getCount", at = @At("HEAD"), cancellable = true)
     private void stackUnlimiter$getFacadeCount(CallbackInfoReturnable<Integer> callback) {
         if (this.stackUnlimiter$initialized) {
-            callback.setReturnValue(LongCountMath.facade(this.stackUnlimiter$exactCount));
+            callback.setReturnValue(this.count);
         }
     }
 
@@ -78,17 +78,10 @@ public abstract class ItemStackMixin implements LongCountAccess {
             throw new IllegalArgumentException("Stack count cannot be negative: " + requested);
         }
         long current = this.stackUnlimiter$getLongCount();
-        if (current > Integer.MAX_VALUE
-                && requested != 0
-                && requested != Integer.MAX_VALUE) {
-            throw new IllegalStateException(
-                    "Ambiguous setCount(int) on a saturated stack; use StackCounts or grow/shrink"
-            );
-        }
-
-        if (requested != Integer.MAX_VALUE || current <= Integer.MAX_VALUE) {
-            this.stackUnlimiter$setLongCountUnchecked(requested);
-        }
+        long updated = current > this.count && requested > 0
+                ? LongCountMath.addExactNonNegative(current, (long) requested - this.count)
+                : requested;
+        this.stackUnlimiter$setLongCountUnchecked(updated);
         callback.cancel();
     }
 
@@ -158,8 +151,12 @@ public abstract class ItemStackMixin implements LongCountAccess {
 
     @Override
     public void stackUnlimiter$setLongCountUnchecked(long exactCount) {
-        this.stackUnlimiter$exactCount = LongCountMath.requireValid(exactCount);
-        this.count = LongCountMath.facade(exactCount);
+        long validCount = LongCountMath.requireValid(exactCount);
+        ItemStack self = (ItemStack) (Object) this;
+        this.stackUnlimiter$exactCount = validCount;
+        this.count = validCount == 0
+                ? 0
+                : (int) Math.min(validCount, StackCounts.vanillaMaxStackSize(self));
         this.stackUnlimiter$initialized = true;
     }
 }
