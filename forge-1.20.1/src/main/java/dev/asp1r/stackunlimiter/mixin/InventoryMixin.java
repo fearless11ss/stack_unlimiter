@@ -84,6 +84,28 @@ public abstract class InventoryMixin {
         callback.setReturnValue(true);
     }
 
+    @Inject(
+            method = "removeFromSelected",
+            at = @At("HEAD"),
+            cancellable = true
+    )
+    private void stackUnlimiter$removeExactSelectedStack(
+            boolean removeEntireStack,
+            CallbackInfoReturnable<ItemStack> callback
+    ) {
+        Inventory inventory = (Inventory) (Object) this;
+        ItemStack selectedStack = inventory.getSelected();
+        if (!removeEntireStack
+                || selectedStack.isEmpty()
+                || StackCounts.get(selectedStack) <= selectedStack.getCount()) {
+            return;
+        }
+
+        ItemStack removed = StackCounts.split(selectedStack, StackCounts.get(selectedStack));
+        inventory.setItem(inventory.selected, ItemStack.EMPTY);
+        callback.setReturnValue(removed);
+    }
+
     private static int stackUnlimiter$findTargetSlot(Inventory inventory, ItemStack incoming) {
         int mergeSlot = stackUnlimiter$findMergeSlot(inventory, incoming);
         return mergeSlot >= 0 ? mergeSlot : inventory.getFreeSlot();

@@ -16,6 +16,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ChestMenu;
@@ -25,6 +26,7 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
 import net.minecraftforge.items.ItemStackHandler;
@@ -489,6 +491,31 @@ public final class StackCountGameTests {
         player.inventoryMenu.clicked(36, 1, ClickType.THROW, player);
         assertEquals(0, StackCounts.get(player.getInventory().getItem(0)),
                 "full-stack throw remainder");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "minecraft", template = "empty")
+    public static void hotbarFullStackThrowCreatesOneExactItemEntity(GameTestHelper helper) {
+        ServerPlayer player = stackUnlimiter$createPlayer(helper, "stack-unlimiter-item-entity-drop-test");
+        player.setPos(helper.absolutePos(new net.minecraft.core.BlockPos(1, 2, 1)).getCenter());
+        player.getInventory().setItem(0, stackUnlimiter$exactStack(Items.OAK_PLANKS, 250_000));
+
+        ItemStack removed = player.getInventory().removeFromSelected(true);
+        assertEquals(250_000, StackCounts.get(removed), "hotbar full-stack removal count");
+        player.drop(removed, false);
+
+        List<ItemEntity> drops = helper.getLevel().getEntitiesOfClass(
+                ItemEntity.class,
+                new AABB(player.blockPosition()).inflate(5),
+                entity -> entity.getItem().is(Items.OAK_PLANKS)
+        );
+        assertEquals(1, drops.size(), "full-stack item entity count");
+        assertEquals(250_000, StackCounts.get(drops.get(0).getItem()), "full-stack dropped item count");
+
+        drops.get(0).setNoPickUpDelay();
+        drops.get(0).playerTouch(player);
+        assertEquals(250_000, stackUnlimiter$countInventoryItem(player, Items.OAK_PLANKS),
+                "full-stack pickup round trip");
         helper.succeed();
     }
 
