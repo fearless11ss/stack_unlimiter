@@ -37,10 +37,10 @@ updated: 2026-11-08
 
 | Модуль | Minecraft | Loader | Java | Версия | Changelog | Статус |
 | --- | --- | --- | --- | --- | --- | --- |
-| [[forge-1.20.1/gradle.properties\|forge-1.20.1]] | 1.20.1 | Forge | 17 | `0.1.11` | [[RELEASE_CHANGELOGS#Forge 1.20.1 — 0.1.11\|0.1.11]] | активно тестируется |
-| [[forge-26.3/gradle.properties\|forge-26.3]] | 26.3 | Forge | 25 | `0.1.16` | [[RELEASE_CHANGELOGS#Forge 26.3 — 0.1.16\|0.1.16]] | активно тестируется |
-| [[fabric-26.3/gradle.properties\|fabric-26.3]] | 26.3 | Fabric | 25+ для Gradle | `0.1.9` | [[RELEASE_CHANGELOGS#Fabric 26.3 — 0.1.9\|0.1.9]] | исправлена полная матрица vanilla-инвентаря |
-| [[neoforge-26.3/gradle.properties\|neoforge-26.3]] | 26.3 | NeoForge | 25 | `0.1.9` | [[RELEASE_CHANGELOGS#NeoForge 26.3 — 0.1.9\|0.1.9]] | 34 GameTest проходят; релиз загружен на Modrinth и CurseForge |
+| `forge-1.20.1` | 1.20.1 | Forge | 17 | `0.1.11` | Inventory fixes | загружен на Modrinth и CurseForge |
+| `forge-26.3` | 26.3 | Forge | 25 | `0.1.16` | Initial Forge 26.3 release | загружен на Modrinth и CurseForge |
+| `fabric-26.3` | 26.3 | Fabric | 25+ для Gradle | `0.1.9` | Initial Fabric release | загружен на Modrinth и CurseForge |
+| `neoforge-26.3` | 26.3 | NeoForge | 25 | `0.1.9` | Initial NeoForge release | загружен на Modrinth и CurseForge |
 
 > [!warning] Независимые реализации
 > Исправление в одном модуле не переносится автоматически в остальные. Перед портированием сравни `stack_unlimiter.mixins.json`, Minecraft API и набор GameTest конкретной пары.
@@ -78,7 +78,7 @@ flowchart LR
 
 | Ветка | Exact-count в памяти | Сохранение | Сеть |
 | --- | --- | --- | --- |
-| Forge 1.20.1 | `@Unique long` в `ItemStackMixin` | [[forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/internal/LongCountNbt.java\|LongCountNbt]] | [[forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/FriendlyByteBufMixin.java\|FriendlyByteBufMixin]] добавляет временный exact-count в NBT пакета |
+| Forge 1.20.1 | `@Unique long` в `ItemStackMixin` | `LongCountNbt` | `FriendlyByteBufMixin` добавляет временный exact-count в NBT пакета |
 | Forge 26.3 | `DataComponents.CUSTOM_DATA` | внутренний ключ в custom data | сериализация компонентов Minecraft |
 | Fabric 26.3 | `DataComponents.CUSTOM_DATA` | внутренний ключ в custom data | сериализация компонентов Minecraft |
 | NeoForge 26.3 | `DataComponents.CUSTOM_DATA` | внутренний ключ в custom data | сериализация компонентов Minecraft |

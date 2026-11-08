@@ -21,15 +21,16 @@ updated: 2026-11-08
 
 ## Индекс релизов
 
-| Minecraft | Loader | Версия мода | Java | Площадки, для которых подготовлен текст | Changelog |
-| --- | --- | --- | --- | --- | --- |
-| 1.20.1 | Forge | `0.1.7` | 17 | Modrinth, CurseForge | [[#Forge 1.20.1 — 0.1.7\|Initial public beta]] |
-| 1.20.1 | Forge | `0.1.11` | 17 | Modrinth, CurseForge | [[#Forge 1.20.1 — 0.1.11\|Inventory fixes]] |
-| 26.3 | Forge | `0.1.16` | 25 | Modrinth, CurseForge | [[#Forge 26.3 — 0.1.16\|Initial Forge 26.3 release]] |
-| 26.3 | Fabric | `0.1.9` | 25 | Modrinth, CurseForge | [[#Fabric 26.3 — 0.1.9\|Initial Fabric release]] |
-| 26.3 | NeoForge | `0.1.9` | 25 | Modrinth, CurseForge | [[#NeoForge 26.3 — 0.1.9\|Initial NeoForge release]] |
+| Minecraft | Loader | Версия мода | Java | Площадки | Статус | Changelog |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1.20.1 | Forge | `0.1.7` | 17 | Modrinth, CurseForge | исторический релиз | Initial public beta |
+| 1.20.1 | Forge | `0.1.11` | 17 | Modrinth, CurseForge | загружен | Inventory fixes |
+| 26.3 | Forge | `0.1.16` | 25 | Modrinth, CurseForge | загружен | Initial Forge 26.3 release |
+| 26.3 | Fabric | `0.1.9` | 25 | Modrinth, CurseForge | загружен | Initial Fabric release |
+| 26.3 | NeoForge | `0.1.9` | 25 | Modrinth, CurseForge | загружен | Initial NeoForge release |
 
-Статус в таблице означает, что текст был подготовлен в рабочем чате. Факт окончательной публикации на площадке нужно отмечать отдельно только после подтверждения пользователя.
+> [!success] Все текущие сборки загружены
+> Forge 1.20.1 `0.1.11`, Forge 26.3 `0.1.16`, Fabric 26.3 `0.1.9` и NeoForge 26.3 `0.1.9` загружены на Modrinth и CurseForge.
 
 ## Общие поля публикации
 
