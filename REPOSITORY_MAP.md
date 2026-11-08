@@ -35,9 +35,9 @@ updated: 2026-11-08
 
 | Модуль | Minecraft | Loader | Java | Версия | Статус |
 | --- | --- | --- | --- | --- | --- |
-| [[forge-1.20.1/gradle.properties|forge-1.20.1]] | 1.20.1 | Forge | 17 | `gradle.properties` | активно тестируется |
-| [[forge-26.3/gradle.properties|forge-26.3]] | 26.3 | Forge | 25 | `gradle.properties` | активно тестируется |
-| [[fabric-26.3/gradle.properties|fabric-26.3]] | 26.3 | Fabric | 25+ для Gradle | `gradle.properties` | отдельная реализация |
+| [[forge-1.20.1/gradle.properties|forge-1.20.1]] | 1.20.1 | Forge | 17 | `0.1.11` | активно тестируется |
+| [[forge-26.3/gradle.properties|forge-26.3]] | 26.3 | Forge | 25 | `0.1.16` | активно тестируется |
+| [[fabric-26.3/gradle.properties|fabric-26.3]] | 26.3 | Fabric | 25+ для Gradle | `0.1.9` | исправлена полная матрица vanilla-инвентаря |
 
 > [!warning] Независимые реализации
 > Исправление в одном модуле не переносится автоматически в остальные. Перед портированием сравни `stack_unlimiter.mixins.json`, Minecraft API и набор GameTest конкретной пары.
@@ -165,6 +165,11 @@ cd forge-26.3
 
 - Модель exact-count близка к Forge 26.3, но loader-интеграции независимы.
 - Здесь нет Forge `ItemStackHandlerMixin`.
+- [[fabric-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerMenuInteractionMixin.java|AbstractContainerMenuInteractionMixin]] обрабатывает exact-count для ЛКМ, ПКМ, Shift-click, выброса, double-click, number key и drag.
+- [[fabric-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/InventoryMixin.java|InventoryMixin]] отдельно перехватывает выброс всего выбранного хотбар-стака через `removeFromSelected`.
+- [[fabric-26.3/src/main/java/dev/asp1r/stackunlimiter/internal/BulkCraftingDispatch.java|BulkCraftingDispatch]] оставляет массовый крафт авторитетным серверу и не позволяет клиентскому предсказанию повторно обработать результат.
+- [[fabric-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerScreenMixin.java|AbstractContainerScreenMixin]] использует exact-count при предпросмотре drag-распределения.
+- Для текста количества нужен непрозрачный ARGB `0xFFFFFFFF`: `0xFFFFFF` имеет нулевой alpha и делает подпись невидимой в Minecraft 26.3.
 - GameTest вынесены в отдельный source set `src/gametest`.
 - Gradle-процесс должен запускаться на Java 25 или новее, а не только использовать toolchain.
 
@@ -179,6 +184,7 @@ cd fabric-26.3
 
 - Unit: `src/test/java/dev/asp1r/stackunlimiter/`.
 - Integration: [[fabric-26.3/src/gametest/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java|StackCountGameTests]].
+- Подтверждённое состояние `0.1.9`: `test`, `clean build` и все 34 теста, обнаруженные `runGameTest`, проходят.
 - Результат: `fabric-26.3/build/libs/`.
 
 ## Диагностические маршруты
@@ -217,6 +223,13 @@ StackedContents → ServerPlaceRecipe → crafting grid → result slot → bulk
 
 Начинать с `StackCountDisplay` и `GuiGraphicsMixin`. Отдельные пороги: `64 → 65`, `999 → 1000`, суффиксы `K/M/B/T/Q/E`, максимальная ширина и `Long.MAX_VALUE`.
 
+Если подпись полностью отсутствует при правильном exact-count:
+
+1. Проверить, что `StackCountDisplay.requiresExactLabel(exactCount, vanillaCount)` возвращает `true`.
+2. Проверить загрузку `GuiGraphicsMixin` в секции `client` файла `stack_unlimiter.mixins.json`.
+3. Проверить alpha-канал цвета. Для белого текста использовать `0xFFFFFFFF`, а не прозрачный `0x00FFFFFF`.
+4. Проверить синхронизацию exact-count на клиенте до начала отрисовки.
+
 ## Минимальная матрица регрессии
 
 - exact-count: `65`, `999`, `1_000`, `100_000`, `1_000_000`, значение выше `Integer.MAX_VALUE`;
@@ -242,8 +255,9 @@ StackedContents → ServerPlaceRecipe → crafting grid → result slot → bulk
 > 5. Выполнить `clean build`.
 > 6. Если менялся код или поведение мода — повысить версию модуля и обновить таблицу в [[README]]. Документация и публикационные файлы версию не повышают.
 > 7. Проверить версию и Minecraft range внутри JAR.
-> 8. Не добавлять `artwork/` в коммит без отдельного запроса.
-> 9. Сделать содержательный commit и push.
+> 8. Обновить эту карту, если изменились структура, версия, тестовая матрица, сборка, диагностика или важное техническое решение.
+> 9. Не добавлять `artwork/` и `.obsidian/` в коммит без отдельного запроса.
+> 10. Сделать содержательный commit и push.
 
 ## Когда обновлять эту карту
 
@@ -252,5 +266,7 @@ StackedContents → ServerPlaceRecipe → crafting grid → result slot → bulk
 - изменился способ хранения или сетевой передачи exact-count;
 - изменились команды сборки или тестов;
 - диагностический маршрут оказался неполным.
+- изменились версия модуля, покрытие операций или подтверждённое состояние тестов;
+- обнаружена полезная причина бага или ограничение конкретной версии Minecraft/loader.
 
 Версии в таблице модулей — снимок состояния. Источник истины всегда находится в соответствующем `gradle.properties` и в [[README#Available builds|таблице сборок README]].
