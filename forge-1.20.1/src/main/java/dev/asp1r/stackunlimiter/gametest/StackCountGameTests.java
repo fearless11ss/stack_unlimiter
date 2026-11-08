@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import dev.asp1r.stackunlimiter.StackUnlimiter;
 import dev.asp1r.stackunlimiter.api.StackCounts;
 import io.netty.buffer.Unpooled;
+import net.minecraft.core.NonNullList;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -22,6 +23,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerSynchronizer;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -520,6 +522,41 @@ public final class StackCountGameTests {
     }
 
     @GameTest(templateNamespace = "minecraft", template = "empty")
+    public static void itemEntityPickupMergesPastVanillaLimit(GameTestHelper helper) {
+        ServerPlayer player = stackUnlimiter$createPlayer(helper, "stack-unlimiter-item-pickup-test");
+        player.getInventory().setItem(0, new ItemStack(Items.OAK_LOG, 64));
+        CapturingSynchronizer synchronizer = new CapturingSynchronizer();
+        player.inventoryMenu.setSynchronizer(synchronizer);
+        assertEquals(64, StackCounts.get(synchronizer.initialItems.get(36)),
+                "initial synchronized log count");
+        synchronizer.clearSlotChange();
+        ItemEntity droppedLog = new ItemEntity(
+                helper.getLevel(),
+                player.getX(),
+                player.getY(),
+                player.getZ(),
+                new ItemStack(Items.OAK_LOG)
+        );
+        droppedLog.setNoPickUpDelay();
+
+        droppedLog.playerTouch(player);
+
+        assertEquals(65, StackCounts.get(player.getInventory().getItem(0)),
+                "log count after item-entity pickup");
+        if (!droppedLog.isRemoved()) {
+            throw new GameTestAssertException("picked-up item entity should be removed");
+        }
+        player.inventoryMenu.broadcastChanges();
+        assertEquals(36, synchronizer.changedSlot, "synchronized inventory slot");
+        assertEquals(65, StackCounts.get(synchronizer.changedStack),
+                "broadcast log count after item-entity pickup");
+        ClientboundContainerSetContentPacket decoded = stackUnlimiter$roundTripMenu(player.inventoryMenu);
+        assertEquals(65, StackCounts.get(decoded.getItems().get(36)),
+                "client log count after inventory synchronization");
+        helper.succeed();
+    }
+
+    @GameTest(templateNamespace = "minecraft", template = "empty")
     public static void closingContainerReturnsExactCarriedStack(GameTestHelper helper) {
         ServerPlayer player = stackUnlimiter$createPlayer(helper, "stack-unlimiter-close-menu-test");
         SimpleContainer chest = new SimpleContainer(27);
@@ -728,6 +765,44 @@ public final class StackCountGameTests {
     private static void assertEquals(Object expected, Object actual, String subject) {
         if (!java.util.Objects.equals(expected, actual)) {
             throw new GameTestAssertException(subject + ": expected " + expected + ", got " + actual);
+        }
+    }
+
+    private static final class CapturingSynchronizer implements ContainerSynchronizer {
+        private NonNullList<ItemStack> initialItems = NonNullList.create();
+        private int changedSlot = -1;
+        private ItemStack changedStack = ItemStack.EMPTY;
+
+        @Override
+        public void sendInitialData(
+                AbstractContainerMenu menu,
+                NonNullList<ItemStack> items,
+                ItemStack carried,
+                int[] data
+        ) {
+            this.initialItems = NonNullList.withSize(items.size(), ItemStack.EMPTY);
+            for (int slot = 0; slot < items.size(); slot++) {
+                this.initialItems.set(slot, items.get(slot).copy());
+            }
+        }
+
+        @Override
+        public void sendSlotChange(AbstractContainerMenu menu, int slot, ItemStack stack) {
+            this.changedSlot = slot;
+            this.changedStack = stack.copy();
+        }
+
+        @Override
+        public void sendCarriedChange(AbstractContainerMenu menu, ItemStack stack) {
+        }
+
+        @Override
+        public void sendDataChange(AbstractContainerMenu menu, int id, int value) {
+        }
+
+        private void clearSlotChange() {
+            this.changedSlot = -1;
+            this.changedStack = ItemStack.EMPTY;
         }
     }
 }

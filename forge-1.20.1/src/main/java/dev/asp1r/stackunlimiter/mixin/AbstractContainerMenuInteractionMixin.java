@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -26,6 +27,23 @@ public abstract class AbstractContainerMenuInteractionMixin {
 
     @Unique
     private final Set<Integer> stackUnlimiter$exactQuickCraftSlots = new LinkedHashSet<>();
+
+    @Redirect(
+            method = "synchronizeSlotToRemote",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/item/ItemStack;equals(Lnet/minecraft/world/item/ItemStack;Z)Z",
+                    remap = false
+            )
+    )
+    private boolean stackUnlimiter$compareExactCountForRemoteSync(
+            ItemStack current,
+            ItemStack previous,
+            boolean limitTags
+    ) {
+        return StackCounts.get(current) == StackCounts.get(previous)
+                && current.equals(previous, limitTags);
+    }
 
     @Inject(method = "getQuickCraftPlaceCount", at = @At("HEAD"), cancellable = true)
     private static void stackUnlimiter$getExactQuickCraftPlaceCount(
