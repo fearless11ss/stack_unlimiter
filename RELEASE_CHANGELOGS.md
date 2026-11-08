@@ -27,7 +27,7 @@ updated: 2026-11-08
 | 1.20.1 | Forge | `0.1.11` | 17 | Modrinth, CurseForge | [[#Forge 1.20.1 — 0.1.11|Inventory fixes]] |
 | 26.3 | Forge | `0.1.16` | 25 | Modrinth, CurseForge | [[#Forge 26.3 — 0.1.16|Initial Forge 26.3 release]] |
 | 26.3 | Fabric | `0.1.9` | 25 | Modrinth, CurseForge | [[#Fabric 26.3 — 0.1.9|Initial Fabric release]] |
-| 26.3 | NeoForge | `0.1.9` | 25 | Modrinth — загружено; CurseForge — подготовлено | [[#NeoForge 26.3 — 0.1.9|Initial NeoForge release]] |
+| 26.3 | NeoForge | `0.1.9` | 25 | Modrinth, CurseForge | [[#NeoForge 26.3 — 0.1.9|Initial NeoForge release]] |
 
 Статус в таблице означает, что текст был подготовлен в рабочем чате. Факт окончательной публикации на площадке нужно отмечать отдельно только после подтверждения пользователя.
 
@@ -162,8 +162,8 @@ Stack Unlimiter is now available for Fabric.
 
 ## NeoForge 26.3 — 0.1.9
 
-> [!success] Загрузка на Modrinth подтверждена
-> Файл загружен на Modrinth как Release с display name `Stack Unlimiter 0.1.9 — NeoForge 26.3`, Minecraft `26.3`, loader `NeoForge`, окружением Client + Server и тем же changelog, который подготовлен ниже для CurseForge.
+> [!success] Загрузка на Modrinth и CurseForge подтверждена
+> Файл загружен на обе площадки как Release с display name `Stack Unlimiter 0.1.9 — NeoForge 26.3`, Minecraft `26.3`, loader `NeoForge`, окружением Client + Server и одинаковым changelog.
 
 ```markdown
 # Initial NeoForge release
