@@ -20,6 +20,9 @@ Every directory is an independent Gradle module with its own wrapper,
 dependencies, source files, resources, unit tests, and integration tests. Run
 Gradle from the directory for the exact Minecraft and loader pair you want.
 
+For architecture, subsystem ownership, testing commands, and bug-diagnosis
+routes, see the [Obsidian repository map](REPOSITORY_MAP.md).
+
 ## Build
 
 On Windows:
