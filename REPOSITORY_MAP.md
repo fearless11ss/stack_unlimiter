@@ -23,6 +23,7 @@ updated: 2026-11-08
 
 - [[README|Обзор проекта и поддерживаемые сборки]]
 - [[CONTRIBUTING|Правила участия]]
+- [[RELEASE_CHANGELOGS|Каталог релизных changelog и полей публикации]]
 - [[LICENSE.txt|MIT License]]
 - [[.github/ISSUE_TEMPLATE/bug_report.yml|Шаблон баг-репорта]]
 - [[forge-1.20.1/gradle.properties|Forge 1.20.1 — версии и метаданные]]
@@ -34,12 +35,12 @@ updated: 2026-11-08
 
 Каждая пара Minecraft + mod loader — полностью самостоятельный Gradle-модуль. Сборку и тесты запускай из каталога нужной пары.
 
-| Модуль | Minecraft | Loader | Java | Версия | Статус |
-| --- | --- | --- | --- | --- | --- |
-| [[forge-1.20.1/gradle.properties|forge-1.20.1]] | 1.20.1 | Forge | 17 | `0.1.11` | активно тестируется |
-| [[forge-26.3/gradle.properties|forge-26.3]] | 26.3 | Forge | 25 | `0.1.16` | активно тестируется |
-| [[fabric-26.3/gradle.properties|fabric-26.3]] | 26.3 | Fabric | 25+ для Gradle | `0.1.9` | исправлена полная матрица vanilla-инвентаря |
-| [[neoforge-26.3/gradle.properties|neoforge-26.3]] | 26.3 | NeoForge | 25 | `0.1.9` | сборка и все 34 обнаруженных GameTest проходят |
+| Модуль | Minecraft | Loader | Java | Версия | Changelog | Статус |
+| --- | --- | --- | --- | --- | --- | --- |
+| [[forge-1.20.1/gradle.properties|forge-1.20.1]] | 1.20.1 | Forge | 17 | `0.1.11` | [[RELEASE_CHANGELOGS#Forge 1.20.1 — 0.1.11|0.1.11]] | активно тестируется |
+| [[forge-26.3/gradle.properties|forge-26.3]] | 26.3 | Forge | 25 | `0.1.16` | [[RELEASE_CHANGELOGS#Forge 26.3 — 0.1.16|0.1.16]] | активно тестируется |
+| [[fabric-26.3/gradle.properties|fabric-26.3]] | 26.3 | Fabric | 25+ для Gradle | `0.1.9` | [[RELEASE_CHANGELOGS#Fabric 26.3 — 0.1.9|0.1.9]] | исправлена полная матрица vanilla-инвентаря |
+| [[neoforge-26.3/gradle.properties|neoforge-26.3]] | 26.3 | NeoForge | 25 | `0.1.9` | [[RELEASE_CHANGELOGS#NeoForge 26.3 — 0.1.9|0.1.9]] | сборка и все 34 обнаруженных GameTest проходят |
 
 > [!warning] Независимые реализации
 > Исправление в одном модуле не переносится автоматически в остальные. Перед портированием сравни `stack_unlimiter.mixins.json`, Minecraft API и набор GameTest конкретной пары.
@@ -301,6 +302,14 @@ StackedContents → ServerPlaceRecipe → crafting grid → result slot → bulk
 > 9. Не добавлять `artwork/` и `.obsidian/` в коммит без отдельного запроса.
 > 10. Сделать содержательный commit и push.
 
+### Рабочий цикл публикации
+
+1. Сверить версию JAR и пару Minecraft + loader с таблицей модулей.
+2. Взять точный текст из [[RELEASE_CHANGELOGS]].
+3. После подготовки нового текста сразу записать его в каталог с указанием площадки.
+4. Не добавлять конкретную версию Minecraft в общее описание проекта.
+5. Не повышать версию мода при изменении только публикационных документов.
+
 ## Когда обновлять эту карту
 
 - добавлена новая пара Minecraft + loader;
@@ -310,5 +319,6 @@ StackedContents → ServerPlaceRecipe → crafting grid → result slot → bulk
 - диагностический маршрут оказался неполным.
 - изменились версия модуля, покрытие операций или подтверждённое состояние тестов;
 - обнаружена полезная причина бага или ограничение конкретной версии Minecraft/loader.
+- подготовлен или изменён changelog релиза — обновить [[RELEASE_CHANGELOGS]] и ссылку из таблицы модулей;
 
 Версии в таблице модулей — снимок состояния. Источник истины всегда находится в соответствующем `gradle.properties` и в [[README#Available builds|таблице сборок README]].

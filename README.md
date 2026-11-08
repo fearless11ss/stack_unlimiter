@@ -23,6 +23,8 @@ Gradle from the directory for the exact Minecraft and loader pair you want.
 
 For architecture, subsystem ownership, testing commands, and bug-diagnosis
 routes, see the [Obsidian repository map](REPOSITORY_MAP.md).
+Release-specific publication text is stored in the
+[release changelog catalog](RELEASE_CHANGELOGS.md).
 
 ## Build
 
