@@ -170,6 +170,8 @@ cd forge-26.3
 - [[fabric-26.3/src/main/java/dev/asp1r/stackunlimiter/internal/BulkCraftingDispatch.java|BulkCraftingDispatch]] оставляет массовый крафт авторитетным серверу и не позволяет клиентскому предсказанию повторно обработать результат.
 - [[fabric-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerScreenMixin.java|AbstractContainerScreenMixin]] использует exact-count при предпросмотре drag-распределения.
 - Для текста количества нужен непрозрачный ARGB `0xFFFFFFFF`: `0xFFFFFF` имеет нулевой alpha и делает подпись невидимой в Minecraft 26.3.
+- Fabric API используется только source set `src/gametest` для автоматических тестов. Production-код зависит от Fabric Loader и Mixin, поэтому Fabric API не является обязательной зависимостью для игрока и не добавляется в metadata релиза.
+- `net.fabricmc.api.ModInitializer` входит в Fabric Loader, несмотря на имя пакета `fabricmc.api`.
 - GameTest вынесены в отдельный source set `src/gametest`.
 - Gradle-процесс должен запускаться на Java 25 или новее, а не только использовать toolchain.
 
