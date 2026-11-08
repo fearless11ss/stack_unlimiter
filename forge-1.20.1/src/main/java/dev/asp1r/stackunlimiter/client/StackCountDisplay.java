@@ -33,6 +33,10 @@ public final class StackCountDisplay {
         return number + SUFFIXES[suffix];
     }
 
+    public static String overrideVanillaLabel(long exactCount, int facadeCount) {
+        return exactCount == facadeCount ? null : format(exactCount);
+    }
+
     public static float scaleForWidth(int width) {
         if (width <= 0 || width <= MAX_LABEL_WIDTH) {
             return 1.0F;

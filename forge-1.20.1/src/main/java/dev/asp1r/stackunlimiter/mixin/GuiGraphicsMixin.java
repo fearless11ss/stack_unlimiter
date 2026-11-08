@@ -30,14 +30,20 @@ public abstract class GuiGraphicsMixin {
         }
 
         long exactCount = StackCounts.get(stack);
-        if (exactCount < 1_000) {
+        String label = StackCountDisplay.overrideVanillaLabel(exactCount, stack.getCount());
+        if (label == null) {
             return;
         }
 
         GuiGraphics graphics = (GuiGraphics) (Object) this;
+        if (exactCount < 1_000) {
+            graphics.renderItemDecorations(font, stack, x, y, label);
+            callback.cancel();
+            return;
+        }
+
         graphics.renderItemDecorations(font, stack, x, y, "");
 
-        String label = StackCountDisplay.format(exactCount);
         int width = font.width(label);
         float scale = StackCountDisplay.scaleForWidth(width);
 
