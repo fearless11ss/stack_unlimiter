@@ -397,4 +397,3 @@ public abstract class AbstractContainerMenuInteractionMixin {
     }
 }
 
-
