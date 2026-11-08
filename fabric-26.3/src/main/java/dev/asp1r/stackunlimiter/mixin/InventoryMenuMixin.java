@@ -1,12 +1,14 @@
 package dev.asp1r.stackunlimiter.mixin;
 
 import dev.asp1r.stackunlimiter.api.StackCounts;
+import dev.asp1r.stackunlimiter.internal.BulkCraftingDispatch;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.ResultContainer;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -26,6 +28,13 @@ public abstract class InventoryMenuMixin {
             int slotIndex,
             CallbackInfoReturnable<ItemStack> callback
     ) {
+        if (BulkCraftingDispatch.shouldDeferResultClickToServer(player.level().isClientSide(), slotIndex)) {
+            callback.setReturnValue(ItemStack.EMPTY);
+            return;
+        }
+        if (slotIndex != 0 && stackUnlimiter$quickMoveExactStack(player, slotIndex, callback)) {
+            return;
+        }
         if (slotIndex != 0) {
             return;
         }
@@ -99,6 +108,90 @@ public abstract class InventoryMenuMixin {
         }
         inventory.setChanged();
         callback.setReturnValue(ItemStack.EMPTY);
+    }
+
+    private boolean stackUnlimiter$quickMoveExactStack(
+            Player player,
+            int sourceIndex,
+            CallbackInfoReturnable<ItemStack> callback
+    ) {
+        InventoryMenu menu = (InventoryMenu) (Object) this;
+        if (!menu.isValidSlotIndex(sourceIndex)) {
+            return false;
+        }
+
+        Slot sourceSlot = menu.getSlot(sourceIndex);
+        ItemStack source = sourceSlot.getItem();
+        long exactCount = StackCounts.get(source);
+        if (source.isEmpty()
+                || exactCount <= source.getCount()
+                || !StackCounts.isEligible(source)
+                || !sourceSlot.mayPickup(player)) {
+            return false;
+        }
+
+        int start;
+        int end;
+        if (sourceIndex >= InventoryMenu.INV_SLOT_START && sourceIndex < InventoryMenu.INV_SLOT_END) {
+            start = InventoryMenu.USE_ROW_SLOT_START;
+            end = InventoryMenu.USE_ROW_SLOT_END;
+        } else if (sourceIndex >= InventoryMenu.USE_ROW_SLOT_START
+                && sourceIndex < InventoryMenu.USE_ROW_SLOT_END) {
+            start = InventoryMenu.INV_SLOT_START;
+            end = InventoryMenu.INV_SLOT_END;
+        } else {
+            start = InventoryMenu.INV_SLOT_START;
+            end = InventoryMenu.USE_ROW_SLOT_END;
+        }
+
+        int destination = stackUnlimiter$findExactDestination(menu, source, sourceIndex, start, end);
+        if (destination < 0) {
+            callback.setReturnValue(ItemStack.EMPTY);
+            return true;
+        }
+
+        ItemStack original = source.copy();
+        Slot destinationSlot = menu.getSlot(destination);
+        ItemStack target = destinationSlot.getItem();
+        if (target.isEmpty()) {
+            destinationSlot.setByPlayer(original.copy());
+        } else {
+            StackCounts.grow(target, exactCount);
+            destinationSlot.setChanged();
+        }
+
+        sourceSlot.setByPlayer(ItemStack.EMPTY, original);
+        sourceSlot.onTake(player, original);
+        callback.setReturnValue(original);
+        return true;
+    }
+
+    private static int stackUnlimiter$findExactDestination(
+            InventoryMenu menu,
+            ItemStack source,
+            int sourceIndex,
+            int start,
+            int end
+    ) {
+        int empty = -1;
+        for (int index = start; index < end; index++) {
+            if (index == sourceIndex) {
+                continue;
+            }
+            Slot targetSlot = menu.getSlot(index);
+            if (!targetSlot.mayPlace(source)) {
+                continue;
+            }
+            ItemStack target = targetSlot.getItem();
+            if (!target.isEmpty() && StackCounts.sameItemSameComponents(target, source)) {
+                if (Long.MAX_VALUE - StackCounts.get(target) >= StackCounts.get(source)) {
+                    return index;
+                }
+            } else if (target.isEmpty() && empty < 0) {
+                empty = index;
+            }
+        }
+        return empty;
     }
 
     private static int stackUnlimiter$findDestination(

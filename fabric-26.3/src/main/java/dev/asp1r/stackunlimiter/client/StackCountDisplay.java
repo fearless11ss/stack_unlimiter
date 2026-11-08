@@ -4,6 +4,7 @@ import java.util.Locale;
 
 public final class StackCountDisplay {
     public static final int MAX_LABEL_WIDTH = 16;
+    public static final int TEXT_COLOR = 0xFFFFFFFF;
     private static final String[] SUFFIXES = {"", "K", "M", "B", "T", "Q", "E"};
 
     private StackCountDisplay() {
@@ -31,6 +32,10 @@ public final class StackCountDisplay {
             number = String.format(Locale.ROOT, "%.0f", scaled);
         }
         return number + SUFFIXES[suffix];
+    }
+
+    public static boolean requiresExactLabel(long exactCount, int vanillaCount) {
+        return exactCount != vanillaCount;
     }
 
     public static float scaleForWidth(int width) {

@@ -12,6 +12,22 @@ class StackCountDisplayTest {
     }
 
     @Test
+    void abbreviatesOneHundredThousand() {
+        assertEquals("100K", StackCountDisplay.format(100_000));
+    }
+
+    @Test
+    void exactLabelIsUsedWheneverTheStoredCountDiffers() {
+        assertTrue(StackCountDisplay.requiresExactLabel(65, 64));
+        assertTrue(StackCountDisplay.requiresExactLabel(100_000, 64));
+    }
+
+    @Test
+    void labelColorIsFullyOpaque() {
+        assertEquals(0xFF, StackCountDisplay.TEXT_COLOR >>> 24);
+    }
+
+    @Test
     void scalesAnyLabelThatWouldOverflowASlot() {
         int unscaledWidth = 24;
         float scale = StackCountDisplay.scaleForWidth(unscaledWidth);
