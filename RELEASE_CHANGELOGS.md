@@ -8,7 +8,7 @@ tags:
   - releases
   - publishing
 status: active
-updated: 2026-11-08
+updated: 2026-11-09
 ---
 
 # Stack Unlimiter — каталог релизных changelog
@@ -25,12 +25,13 @@ updated: 2026-11-08
 | --- | --- | --- | --- | --- | --- | --- |
 | 1.20.1 | Forge | `0.1.7` | 17 | Modrinth, CurseForge | исторический релиз | Initial public beta |
 | 1.20.1 | Forge | `0.1.11` | 17 | Modrinth, CurseForge | загружен | Inventory fixes |
+| 1.20.1 | Fabric | `0.1.12` | 17 | Modrinth, CurseForge | текст подготовлен, файл не загружен | Initial Fabric release |
 | 26.3 | Forge | `0.1.16` | 25 | Modrinth, CurseForge | загружен | Initial Forge 26.3 release |
 | 26.3 | Fabric | `0.1.9` | 25 | Modrinth, CurseForge | загружен | Initial Fabric release |
 | 26.3 | NeoForge | `0.1.9` | 25 | Modrinth, CurseForge | загружен | Initial NeoForge release |
 
 > [!success] Все текущие сборки загружены
-> Forge 1.20.1 `0.1.11`, Forge 26.3 `0.1.16`, Fabric 26.3 `0.1.9` и NeoForge 26.3 `0.1.9` загружены на Modrinth и CurseForge.
+> Forge 1.20.1 `0.1.11`, Forge 26.3 `0.1.16`, Fabric 26.3 `0.1.9` и NeoForge 26.3 `0.1.9` загружены на Modrinth и CurseForge. Fabric 1.20.1 `0.1.12` пока подготовлен локально.
 
 ## Общие поля публикации
 
@@ -39,7 +40,7 @@ updated: 2026-11-08
 | Display name | `Stack Unlimiter <mod version> — <loader> <Minecraft version>` |
 | Environment | Client и Server; мод обязателен с обеих сторон |
 | Release type | Release |
-| Dependencies | Только соответствующий mod loader; Fabric API для Fabric 26.3 игроку не требуется |
+| Dependencies | Только соответствующий mod loader; Fabric API для Fabric-сборок игроку не требуется |
 | Project description | Без привязки к конкретной версии Minecraft |
 
 ## Forge 1.20.1 — 0.1.7
@@ -124,6 +125,37 @@ Stack Unlimiter is now available for Forge on Minecraft 26.3.
 - Splits oversized stacks using their exact count
 - Keeps bulk crafting authoritative on the server
 - Uses exact counts for drag previews, double-click collection, and nearby item pickup
+
+## Important
+
+- The mod must be installed on both the client and server
+- Worlds containing oversized stacks depend on this mod
+- Back up your worlds before installing or updating
+- Compatibility with every mod is not guaranteed
+```
+
+## Fabric 1.20.1 — 0.1.12
+
+> [!info] Статус
+> JAR собран и протестирован локально. Текст подготовлен для Modrinth и CurseForge, но загрузка ещё не подтверждена.
+
+```markdown
+# Initial Fabric release
+
+Stack Unlimiter is now available for Fabric.
+
+## Features
+
+- Supports stackable item counts beyond the vanilla limit of 64
+- Stores exact stack counts using signed 64-bit values
+- Keeps intentionally non-stackable items non-stackable
+- Supports player inventories and vanilla containers
+- Supports item pickup, dropping, `/give`, and inventory interactions
+- Supports left-click, right-click, Shift-click, number keys, double-click, and drag distribution
+- Supports crafting, bulk Shift-click crafting, and recipe-book placement
+- Displays large stack counts using compact labels
+- Preserves oversized stacks during saving and synchronization
+- Does not require Fabric API at runtime
 
 ## Important
 

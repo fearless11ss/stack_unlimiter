@@ -8,7 +8,7 @@ tags:
   - development
   - repository-map
 status: active
-updated: 2026-11-08
+updated: 2026-11-09
 ---
 
 # Stack Unlimiter — карта репозитория
@@ -27,6 +27,7 @@ updated: 2026-11-08
 - [[LICENSE.txt|MIT License]]
 - [[.github/ISSUE_TEMPLATE/bug_report.yml|Шаблон баг-репорта]]
 - [[forge-1.20.1/gradle.properties|Forge 1.20.1 — версии и метаданные]]
+- [[fabric-1.20.1/gradle.properties|Fabric 1.20.1 — версии и метаданные]]
 - [[forge-26.3/gradle.properties|Forge 26.3 — версии и метаданные]]
 - [[fabric-26.3/gradle.properties|Fabric 26.3 — версии и метаданные]]
 - [[neoforge-26.3/gradle.properties|NeoForge 26.3 — версии и метаданные]]
@@ -38,6 +39,7 @@ updated: 2026-11-08
 | Модуль | Minecraft | Loader | Java | Версия | Changelog | Статус |
 | --- | --- | --- | --- | --- | --- | --- |
 | `forge-1.20.1` | 1.20.1 | Forge | 17 | `0.1.11` | Inventory fixes | загружен на Modrinth и CurseForge |
+| `fabric-1.20.1` | 1.20.1 | Fabric | 17 | `0.1.12` | Initial Fabric release | собран и протестирован, ещё не опубликован |
 | `forge-26.3` | 26.3 | Forge | 25 | `0.1.16` | Initial Forge 26.3 release | загружен на Modrinth и CurseForge |
 | `fabric-26.3` | 26.3 | Fabric | 25+ для Gradle | `0.1.9` | Initial Fabric release | загружен на Modrinth и CurseForge |
 | `neoforge-26.3` | 26.3 | NeoForge | 25 | `0.1.9` | Initial NeoForge release | загружен на Modrinth и CurseForge |
@@ -79,6 +81,7 @@ flowchart LR
 | Ветка | Exact-count в памяти | Сохранение | Сеть |
 | --- | --- | --- | --- |
 | Forge 1.20.1 | `@Unique long` в `ItemStackMixin` | `LongCountNbt` | `FriendlyByteBufMixin` добавляет временный exact-count в NBT пакета |
+| Fabric 1.20.1 | `@Unique long` в `ItemStackMixin` | `LongCountNbt` | `FriendlyByteBufMixin` добавляет временный exact-count в NBT пакета |
 | Forge 26.3 | `DataComponents.CUSTOM_DATA` | внутренний ключ в custom data | сериализация компонентов Minecraft |
 | Fabric 26.3 | `DataComponents.CUSTOM_DATA` | внутренний ключ в custom data | сериализация компонентов Minecraft |
 | NeoForge 26.3 | `DataComponents.CUSTOM_DATA` | внутренний ключ в custom data | сериализация компонентов Minecraft |
@@ -127,6 +130,38 @@ cd forge-1.20.1
 - Unit: [[forge-1.20.1/src/test/java/dev/asp1r/stackunlimiter/internal/LongCountMathTest.java|LongCountMathTest]], [[forge-1.20.1/src/test/java/dev/asp1r/stackunlimiter/client/StackCountDisplayTest.java|StackCountDisplayTest]].
 - Integration: [[forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java|StackCountGameTests]].
 - Результат: `forge-1.20.1/build/libs/`.
+
+## Fabric 1.20.1
+
+### Точки входа
+
+- [[fabric-1.20.1/src/main/java/dev/asp1r/stackunlimiter/StackUnlimiter.java|StackUnlimiter]] — Fabric entry point.
+- [[fabric-1.20.1/src/main/resources/fabric.mod.json|fabric.mod.json]] — точная версия Minecraft, минимальный Fabric Loader и Java 17.
+- [[fabric-1.20.1/src/main/resources/stack_unlimiter.mixins.json|Mixin config]] — список серверных и клиентских интеграций.
+
+### Особенности ветки
+
+- Старая NBT-модель Minecraft 1.20.1 требует [[fabric-1.20.1/src/main/java/dev/asp1r/stackunlimiter/internal/LongCountNbt.java|LongCountNbt]] и [[fabric-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/FriendlyByteBufMixin.java|FriendlyByteBufMixin]].
+- [[fabric-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerMenuInteractionMixin.java|AbstractContainerMenuInteractionMixin]] покрывает ЛКМ, ПКМ, Shift-click, number key, double-click, drag и выброс exact-стаков.
+- [[fabric-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/InventoryMixin.java|InventoryMixin]] объединяет подбор и вставку с существующим стаком, даже когда фасадный `count` уже равен `64`.
+- Forge-specific `ItemStackHandler` и crafting events не переносятся. Vanilla-инвентари, сундуки и крафт покрываются независимой Fabric-реализацией.
+- Fabric API `0.92.12+1.20.1` подключён только в среде разработки для GameTest. Итоговый JAR не содержит его и не объявляет runtime-зависимость; игроку нужен только Fabric Loader.
+- Поддерживаемая матрица loader: Forge, Fabric и NeoForge. Quilt не рассматривается.
+
+### Тесты и сборка
+
+```powershell
+cd fabric-1.20.1
+.\gradlew.bat test
+.\gradlew.bat runGametest
+.\gradlew.bat clean build
+```
+
+- Unit: `src/test/java/dev/asp1r/stackunlimiter/`.
+- Integration: [[fabric-1.20.1/src/gametest/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java|StackCountGameTests]].
+- Подтверждённое состояние `0.1.12`: unit-тесты, `clean build` и все 22 теста `runGametest` проходят.
+- JAR: `fabric-1.20.1/build/libs/stack_unlimiter-fabric-1.20.1-0.1.12.jar`.
+- Metadata JAR: Minecraft строго `1.20.1`, Fabric Loader `>=0.20.1`, Java `>=17`; class-file version `61`.
 
 ## Forge 26.3
 

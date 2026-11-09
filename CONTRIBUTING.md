@@ -23,8 +23,13 @@ inventory or serialization problems.
 Each supported Minecraft and loader pair is an independent Gradle module:
 
 - `forge-1.20.1`
+- `fabric-1.20.1`
 - `forge-26.3`
 - `fabric-26.3`
+- `neoforge-26.3`
+
+The maintained loader scope is Forge, Fabric, and NeoForge. Quilt ports are not
+planned.
 
 Make changes only in the module they target. When a fix applies to more than one
 module, port and test it separately in every affected directory. Do not assume
@@ -47,13 +52,14 @@ Useful commands for Forge modules:
 ./gradlew runGameTestServer
 ```
 
-Useful commands for the Fabric module:
+Useful commands for Fabric modules:
 
 ```text
 ./gradlew clean build
 ./gradlew runClient
 ./gradlew runServer
-./gradlew runGameTest
+./gradlew runGametest    # Fabric 1.20.1
+./gradlew runGameTest    # Fabric 26.3
 ```
 
 On Windows, use `gradlew.bat` instead of `./gradlew`.

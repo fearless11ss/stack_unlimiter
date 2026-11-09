@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "stack_unlimiter_gametest",
+  "version": "${version}",
+  "name": "Stack Unlimiter GameTests",
+  "description": "Development-only integration tests for Stack Unlimiter.",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-gametest": [
+      "dev.asp1r.stackunlimiter.gametest.StackCountGameTests"
+    ]
+  },
+  "depends": {
+    "stack_unlimiter": "*"
+  }
+}

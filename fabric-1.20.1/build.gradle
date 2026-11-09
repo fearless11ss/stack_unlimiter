@@ -1,0 +1,95 @@
+plugins {
+    id 'java'
+    id 'idea'
+    id 'eclipse'
+    id 'fabric-loom' version "${loom_version}"
+}
+
+version = mod_version
+group = mod_group_id
+base.archivesName = "${mod_id}-fabric-${minecraft_version}"
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+    withSourcesJar()
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${loader_version}"
+
+    // Development-only integration-test support. The published mod does not
+    // declare Fabric API as a runtime dependency.
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
+
+    testImplementation platform('org.junit:junit-bom:5.10.3')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+sourceSets {
+    gametest {
+        compileClasspath += main.output + main.compileClasspath
+        runtimeClasspath += main.output + main.runtimeClasspath
+    }
+}
+
+loom {
+    mods {
+        stack_unlimiter {
+            sourceSet sourceSets.main
+        }
+        stack_unlimiter_gametest {
+            sourceSet sourceSets.gametest
+        }
+    }
+
+    runs {
+        gametest {
+            server()
+            name = 'Game Test'
+            source sourceSets.gametest
+            vmArg '-Dfabric-api.gametest'
+            vmArg "-Dfabric-api.gametest.report-file=${project.buildDir}/junit.xml"
+            runDir 'build/gametest'
+        }
+    }
+}
+
+tasks.withType(ProcessResources).configureEach {
+    inputs.property 'version', project.version
+    inputs.property 'minecraft_version', minecraft_version
+    inputs.property 'loader_version', loader_version
+
+    filesMatching('fabric.mod.json') {
+        expand(
+                version: project.version,
+                minecraft_version: minecraft_version,
+                loader_version: loader_version,
+                mod_id: mod_id,
+                mod_name: mod_name,
+                mod_description: mod_description
+        )
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 17
+}
+
+tasks.named('test', Test).configure {
+    useJUnitPlatform()
+}
+
+tasks.named('jar', Jar).configure {
+    from(rootProject.file('LICENSE.txt')) {
+        rename { "LICENSE_${mod_id}.txt" }
+    }
+}
