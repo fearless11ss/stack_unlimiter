@@ -28,6 +28,7 @@ updated: 2026-11-09
 - [Шаблон баг-репорта](.github/ISSUE_TEMPLATE/bug_report.yml)
 - [Forge 1.20.1 — версии и метаданные](forge-1.20.1/gradle.properties)
 - [Fabric 1.20.1 — версии и метаданные](fabric-1.20.1/gradle.properties)
+- [Forge 1.21 — версии и метаданные](forge-1.21/gradle.properties)
 - [Forge 26.3 — версии и метаданные](forge-26.3/gradle.properties)
 - [Fabric 26.3 — версии и метаданные](fabric-26.3/gradle.properties)
 - [NeoForge 26.3 — версии и метаданные](neoforge-26.3/gradle.properties)
@@ -40,6 +41,7 @@ updated: 2026-11-09
 | --- | --- | --- | --- | --- | --- | --- |
 | `forge-1.20.1` | 1.20.1 | Forge | 17 | `0.1.11` | Inventory fixes | загружен на Modrinth и CurseForge |
 | `fabric-1.20.1` | 1.20.1 | Fabric | 17 | `0.1.12` | Initial Fabric release | загружен на Modrinth и CurseForge |
+| `forge-1.21` | 1.21 | Forge | 21 | `0.1.13` | Initial Forge 1.21 release | собран и протестирован, ещё не опубликован |
 | `forge-26.3` | 26.3 | Forge | 25 | `0.1.16` | Initial Forge 26.3 release | загружен на Modrinth и CurseForge |
 | `fabric-26.3` | 26.3 | Fabric | 25+ для Gradle | `0.1.9` | Initial Fabric release | загружен на Modrinth и CurseForge |
 | `neoforge-26.3` | 26.3 | NeoForge | 25 | `0.1.9` | Initial NeoForge release | загружен на Modrinth и CurseForge |
@@ -82,6 +84,7 @@ flowchart LR
 | --- | --- | --- | --- |
 | Forge 1.20.1 | `@Unique long` в `ItemStackMixin` | `LongCountNbt` | `FriendlyByteBufMixin` добавляет временный exact-count в NBT пакета |
 | Fabric 1.20.1 | `@Unique long` в `ItemStackMixin` | `LongCountNbt` | `FriendlyByteBufMixin` добавляет временный exact-count в NBT пакета |
+| Forge 1.21 | `DataComponents.CUSTOM_DATA` | внутренний ключ в custom data | сериализация компонентов Minecraft |
 | Forge 26.3 | `DataComponents.CUSTOM_DATA` | внутренний ключ в custom data | сериализация компонентов Minecraft |
 | Fabric 26.3 | `DataComponents.CUSTOM_DATA` | внутренний ключ в custom data | сериализация компонентов Minecraft |
 | NeoForge 26.3 | `DataComponents.CUSTOM_DATA` | внутренний ключ в custom data | сериализация компонентов Minecraft |
@@ -166,6 +169,43 @@ cd fabric-1.20.1
 ### Публикация
 
 - Modrinth и CurseForge: `0.1.12` загружен как Release с display name `Stack Unlimiter 0.1.12 — Fabric 1.20.1` и changelog из [каталога релизов](RELEASE_CHANGELOGS.md).
+
+## Forge 1.21
+
+### Точки входа
+
+- [StackUnlimiter](forge-1.21/src/main/java/dev/asp1r/stackunlimiter/StackUnlimiter.java) — Forge entry point и регистрация тестов только для GameTest-среды.
+- [mods.toml](forge-1.21/src/main/resources/META-INF/mods.toml) — Forge 51+, точный диапазон Minecraft `1.21` и Java 21.
+- [Mixin config](forge-1.21/src/main/resources/stack_unlimiter.mixins.json) — серверные и клиентские интеграции ветки.
+
+### Особенности ветки
+
+- Exact-count хранится в `DataComponents.CUSTOM_DATA`; отдельный сетевой mixin не нужен, потому что компоненты `ItemStack` сериализуются Minecraft.
+- [AbstractContainerMenuInteractionMixin](forge-1.21/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerMenuInteractionMixin.java) покрывает ЛКМ, ПКМ, Shift-click, number key, double-click, drag и выброс exact-стаков.
+- [InventoryMixin](forge-1.21/src/main/java/dev/asp1r/stackunlimiter/mixin/InventoryMixin.java) объединяет подбор и вставку с существующим oversized-стаком.
+- [ServerPlaceRecipeMixin](forge-1.21/src/main/java/dev/asp1r/stackunlimiter/mixin/ServerPlaceRecipeMixin.java) не позволяет recipe book подменять exact-count фасадным значением `64` при переносе ингредиентов.
+- [InventoryMenuMixin](forge-1.21/src/main/java/dev/asp1r/stackunlimiter/mixin/InventoryMenuMixin.java) выполняет массовый Shift-крафт без цикла по сотням тысяч операций.
+- Forge-совместимость с `ItemStackHandler` находится в [ItemStackHandlerMixin](forge-1.21/src/main/java/dev/asp1r/stackunlimiter/mixin/ItemStackHandlerMixin.java).
+- Пустая тестовая структура находится в [empty.nbt](forge-1.21/src/main/resources/data/stack_unlimiter/structure/empty.nbt).
+
+### Тесты и сборка
+
+```powershell
+cd forge-1.21
+.\gradlew.bat test
+.\gradlew.bat runGameTestServer
+.\gradlew.bat clean build
+```
+
+- Unit: [LongCountMathTest](forge-1.21/src/test/java/dev/asp1r/stackunlimiter/internal/LongCountMathTest.java), [StackCountDisplayTest](forge-1.21/src/test/java/dev/asp1r/stackunlimiter/client/StackCountDisplayTest.java).
+- Integration: [StackCountGameTests](forge-1.21/src/main/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java).
+- Подтверждённое состояние `0.1.13`: unit-тесты, `clean build` и все 23 обязательных теста `runGameTestServer` проходят.
+- JAR: `forge-1.21/build/libs/stack_unlimiter-forge-1.21-0.1.13.jar`.
+- Metadata JAR: Minecraft строго `1.21`, Forge `>=51`, Java `>=21`; class-file version `65`.
+
+### Публикация
+
+- Текст для Modrinth и CurseForge подготовлен в [каталоге релизов](RELEASE_CHANGELOGS.md); файл ещё не опубликован.
 
 ## Forge 26.3
 

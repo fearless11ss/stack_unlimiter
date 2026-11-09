@@ -24,6 +24,7 @@ Each supported Minecraft and loader pair is an independent Gradle module:
 
 - `forge-1.20.1`
 - `fabric-1.20.1`
+- `forge-1.21`
 - `forge-26.3`
 - `fabric-26.3`
 - `neoforge-26.3`

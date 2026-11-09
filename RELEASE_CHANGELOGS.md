@@ -26,12 +26,13 @@ updated: 2026-11-09
 | 1.20.1 | Forge | `0.1.7` | 17 | Modrinth, CurseForge | исторический релиз | Initial public beta |
 | 1.20.1 | Forge | `0.1.11` | 17 | Modrinth, CurseForge | загружен | Inventory fixes |
 | 1.20.1 | Fabric | `0.1.12` | 17 | Modrinth, CurseForge | загружен | Initial Fabric release |
+| 1.21 | Forge | `0.1.13` | 21 | Modrinth, CurseForge | текст подготовлен, файл не загружен | Initial Forge 1.21 release |
 | 26.3 | Forge | `0.1.16` | 25 | Modrinth, CurseForge | загружен | Initial Forge 26.3 release |
 | 26.3 | Fabric | `0.1.9` | 25 | Modrinth, CurseForge | загружен | Initial Fabric release |
 | 26.3 | NeoForge | `0.1.9` | 25 | Modrinth, CurseForge | загружен | Initial NeoForge release |
 
-> [!success] Все текущие сборки загружены
-> Forge 1.20.1 `0.1.11`, Fabric 1.20.1 `0.1.12`, Forge 26.3 `0.1.16`, Fabric 26.3 `0.1.9` и NeoForge 26.3 `0.1.9` загружены на Modrinth и CurseForge.
+> [!success] Ранее опубликованные сборки загружены
+> Forge 1.20.1 `0.1.11`, Fabric 1.20.1 `0.1.12`, Forge 26.3 `0.1.16`, Fabric 26.3 `0.1.9` и NeoForge 26.3 `0.1.9` загружены на Modrinth и CurseForge. Forge 1.21 `0.1.13` подготовлен, но пока не опубликован.
 
 ## Общие поля публикации
 
@@ -95,6 +96,36 @@ updated: 2026-11-09
 - The mod must be installed on both the client and server
 - Back up your worlds before installing or updating
 - Worlds containing oversized stacks depend on this mod
+- Compatibility with every mod is not guaranteed
+```
+
+## Forge 1.21 — 0.1.13
+
+> [!info] Текст подготовлен для Modrinth и CurseForge
+> Рекомендуемый display name: `Stack Unlimiter 0.1.13 — Forge 1.21`. Файл ещё не опубликован.
+
+```markdown
+# Initial Forge release for Minecraft 1.21
+
+Stack Unlimiter is now available for Forge on Minecraft 1.21.
+
+## Features
+
+- Supports stackable item counts beyond the vanilla limit of 64
+- Stores exact stack counts using signed 64-bit values
+- Keeps intentionally non-stackable items non-stackable
+- Supports player inventories, vanilla containers, and compatible Forge item handlers
+- Supports item pickup, dropping, `/give`, and standard inventory interactions
+- Supports left-click, right-click, Shift-click, number keys, double-click, and drag distribution
+- Supports crafting, bulk Shift-click crafting, and recipe-book placement
+- Displays large stack counts using compact labels
+- Preserves oversized stacks during saving and synchronization
+
+## Important
+
+- The mod must be installed on both the client and server
+- Worlds containing oversized stacks depend on this mod
+- Back up your worlds before installing or updating
 - Compatibility with every mod is not guaranteed
 ```
 
