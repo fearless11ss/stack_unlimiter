@@ -21,16 +21,16 @@ updated: 2026-11-09
 
 ## Быстрая навигация
 
-- [[README|Обзор проекта и поддерживаемые сборки]]
-- [[CONTRIBUTING|Правила участия]]
-- [[RELEASE_CHANGELOGS|Каталог релизных changelog и полей публикации]]
-- [[LICENSE.txt|MIT License]]
-- [[.github/ISSUE_TEMPLATE/bug_report.yml|Шаблон баг-репорта]]
-- [[forge-1.20.1/gradle.properties|Forge 1.20.1 — версии и метаданные]]
-- [[fabric-1.20.1/gradle.properties|Fabric 1.20.1 — версии и метаданные]]
-- [[forge-26.3/gradle.properties|Forge 26.3 — версии и метаданные]]
-- [[fabric-26.3/gradle.properties|Fabric 26.3 — версии и метаданные]]
-- [[neoforge-26.3/gradle.properties|NeoForge 26.3 — версии и метаданные]]
+- [Обзор проекта и поддерживаемые сборки](README.md)
+- [Правила участия](CONTRIBUTING.md)
+- [Каталог релизных changelog и полей публикации](RELEASE_CHANGELOGS.md)
+- [MIT License](LICENSE.txt)
+- [Шаблон баг-репорта](.github/ISSUE_TEMPLATE/bug_report.yml)
+- [Forge 1.20.1 — версии и метаданные](forge-1.20.1/gradle.properties)
+- [Fabric 1.20.1 — версии и метаданные](fabric-1.20.1/gradle.properties)
+- [Forge 26.3 — версии и метаданные](forge-26.3/gradle.properties)
+- [Fabric 26.3 — версии и метаданные](fabric-26.3/gradle.properties)
+- [NeoForge 26.3 — версии и метаданные](neoforge-26.3/gradle.properties)
 
 ## Модули
 
@@ -63,10 +63,10 @@ flowchart LR
 
 ### Модель количества
 
-- [[forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/api/StackCounts.java|StackCounts]] — публичные операции `get`, `set`, `grow`, `shrink`, `split`, `copyWithCount` и проверка eligibility.
-- [[forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/internal/LongCountMath.java|LongCountMath]] — безопасная арифметика, защита от отрицательных значений и переполнения.
-- [[forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/internal/LongCountAccess.java|LongCountAccess]] — внутренний мост между API и `ItemStackMixin`.
-- [[forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/ItemStackMixin.java|ItemStackMixin]] — перехватывает основные операции `ItemStack` и поддерживает фасадный `int count`.
+- [StackCounts](forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/api/StackCounts.java) — публичные операции `get`, `set`, `grow`, `shrink`, `split`, `copyWithCount` и проверка eligibility.
+- [LongCountMath](forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/internal/LongCountMath.java) — безопасная арифметика, защита от отрицательных значений и переполнения.
+- [LongCountAccess](forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/internal/LongCountAccess.java) — внутренний мост между API и `ItemStackMixin`.
+- [ItemStackMixin](forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/ItemStackMixin.java) — перехватывает основные операции `ItemStack` и поддерживает фасадный `int count`.
 
 Правила:
 
@@ -106,17 +106,17 @@ flowchart LR
 
 ### Точки входа
 
-- [[forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/StackUnlimiter.java|StackUnlimiter]] — Forge entry point.
-- [[forge-1.20.1/src/main/resources/META-INF/mods.toml|mods.toml]] — loader, Minecraft range, версия и зависимости.
-- [[forge-1.20.1/src/main/resources/stack_unlimiter.mixins.json|Mixin config]] — фактический список активных mixin.
+- [StackUnlimiter](forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/StackUnlimiter.java) — Forge entry point.
+- [mods.toml](forge-1.20.1/src/main/resources/META-INF/mods.toml) — loader, Minecraft range, версия и зависимости.
+- [Mixin config](forge-1.20.1/src/main/resources/stack_unlimiter.mixins.json) — фактический список активных mixin.
 
 ### Особенности ветки
 
 - Minecraft и Forge используют старую NBT-модель `ItemStack`.
-- Сеть требует отдельного [[forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/FriendlyByteBufMixin.java|FriendlyByteBufMixin]].
+- Сеть требует отдельного [FriendlyByteBufMixin](forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/FriendlyByteBufMixin.java).
 - Клиентская синхронизация меню дополнительно проходит через Forge-сравнение `ItemStack.equals(stack, limitTags)`.
-- [[forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerMenuInteractionMixin.java|AbstractContainerMenuInteractionMixin]] содержит основную exact-логику кликов и remote-slot синхронизации.
-- [[forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/GuiGraphicsMixin.java|GuiGraphicsMixin]] обязан явно рисовать exact-count и ниже `1000`, если фасад уже ограничен `64`.
+- [AbstractContainerMenuInteractionMixin](forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerMenuInteractionMixin.java) содержит основную exact-логику кликов и remote-slot синхронизации.
+- [GuiGraphicsMixin](forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/GuiGraphicsMixin.java) обязан явно рисовать exact-count и ниже `1000`, если фасад уже ограничен `64`.
 
 ### Тесты и сборка
 
@@ -127,23 +127,23 @@ cd forge-1.20.1
 .\gradlew.bat clean build
 ```
 
-- Unit: [[forge-1.20.1/src/test/java/dev/asp1r/stackunlimiter/internal/LongCountMathTest.java|LongCountMathTest]], [[forge-1.20.1/src/test/java/dev/asp1r/stackunlimiter/client/StackCountDisplayTest.java|StackCountDisplayTest]].
-- Integration: [[forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java|StackCountGameTests]].
+- Unit: [LongCountMathTest](forge-1.20.1/src/test/java/dev/asp1r/stackunlimiter/internal/LongCountMathTest.java), [StackCountDisplayTest](forge-1.20.1/src/test/java/dev/asp1r/stackunlimiter/client/StackCountDisplayTest.java).
+- Integration: [StackCountGameTests](forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java).
 - Результат: `forge-1.20.1/build/libs/`.
 
 ## Fabric 1.20.1
 
 ### Точки входа
 
-- [[fabric-1.20.1/src/main/java/dev/asp1r/stackunlimiter/StackUnlimiter.java|StackUnlimiter]] — Fabric entry point.
-- [[fabric-1.20.1/src/main/resources/fabric.mod.json|fabric.mod.json]] — точная версия Minecraft, минимальный Fabric Loader и Java 17.
-- [[fabric-1.20.1/src/main/resources/stack_unlimiter.mixins.json|Mixin config]] — список серверных и клиентских интеграций.
+- [StackUnlimiter](fabric-1.20.1/src/main/java/dev/asp1r/stackunlimiter/StackUnlimiter.java) — Fabric entry point.
+- [fabric.mod.json](fabric-1.20.1/src/main/resources/fabric.mod.json) — точная версия Minecraft, минимальный Fabric Loader и Java 17.
+- [Mixin config](fabric-1.20.1/src/main/resources/stack_unlimiter.mixins.json) — список серверных и клиентских интеграций.
 
 ### Особенности ветки
 
-- Старая NBT-модель Minecraft 1.20.1 требует [[fabric-1.20.1/src/main/java/dev/asp1r/stackunlimiter/internal/LongCountNbt.java|LongCountNbt]] и [[fabric-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/FriendlyByteBufMixin.java|FriendlyByteBufMixin]].
-- [[fabric-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerMenuInteractionMixin.java|AbstractContainerMenuInteractionMixin]] покрывает ЛКМ, ПКМ, Shift-click, number key, double-click, drag и выброс exact-стаков.
-- [[fabric-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/InventoryMixin.java|InventoryMixin]] объединяет подбор и вставку с существующим стаком, даже когда фасадный `count` уже равен `64`.
+- Старая NBT-модель Minecraft 1.20.1 требует [LongCountNbt](fabric-1.20.1/src/main/java/dev/asp1r/stackunlimiter/internal/LongCountNbt.java) и [FriendlyByteBufMixin](fabric-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/FriendlyByteBufMixin.java).
+- [AbstractContainerMenuInteractionMixin](fabric-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerMenuInteractionMixin.java) покрывает ЛКМ, ПКМ, Shift-click, number key, double-click, drag и выброс exact-стаков.
+- [InventoryMixin](fabric-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/InventoryMixin.java) объединяет подбор и вставку с существующим стаком, даже когда фасадный `count` уже равен `64`.
 - Forge-specific `ItemStackHandler` и crafting events не переносятся. Vanilla-инвентари, сундуки и крафт покрываются независимой Fabric-реализацией.
 - Fabric API `0.92.12+1.20.1` подключён только в среде разработки для GameTest. Итоговый JAR не содержит его и не объявляет runtime-зависимость; игроку нужен только Fabric Loader.
 - Поддерживаемая матрица loader: Forge, Fabric и NeoForge. Quilt не рассматривается.
@@ -158,7 +158,7 @@ cd fabric-1.20.1
 ```
 
 - Unit: `src/test/java/dev/asp1r/stackunlimiter/`.
-- Integration: [[fabric-1.20.1/src/gametest/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java|StackCountGameTests]].
+- Integration: [StackCountGameTests](fabric-1.20.1/src/gametest/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java).
 - Подтверждённое состояние `0.1.12`: unit-тесты, `clean build` и все 22 теста `runGametest` проходят.
 - JAR: `fabric-1.20.1/build/libs/stack_unlimiter-fabric-1.20.1-0.1.12.jar`.
 - Metadata JAR: Minecraft строго `1.20.1`, Fabric Loader `>=0.20.1`, Java `>=17`; class-file version `61`.
@@ -167,16 +167,16 @@ cd fabric-1.20.1
 
 ### Точки входа
 
-- [[forge-26.3/src/main/java/dev/asp1r/stackunlimiter/StackUnlimiter.java|StackUnlimiter]].
-- [[forge-26.3/src/main/resources/META-INF/mods.toml|mods.toml]].
-- [[forge-26.3/src/main/resources/stack_unlimiter.mixins.json|Mixin config]].
+- [StackUnlimiter](forge-26.3/src/main/java/dev/asp1r/stackunlimiter/StackUnlimiter.java).
+- [mods.toml](forge-26.3/src/main/resources/META-INF/mods.toml).
+- [Mixin config](forge-26.3/src/main/resources/stack_unlimiter.mixins.json).
 
 ### Особенности ветки
 
 - Exact-count хранится в `DataComponents.CUSTOM_DATA`.
-- [[forge-26.3/src/main/java/dev/asp1r/stackunlimiter/api/StackCounts.java|StackCounts.sameItemSameComponents]] игнорирует только внутренний exact-count при сравнении custom data.
-- [[forge-26.3/src/main/java/dev/asp1r/stackunlimiter/internal/BulkCraftingDispatch.java|BulkCraftingDispatch]] координирует bulk crafting.
-- Forge-совместимость с capability-инвентарями находится в [[forge-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/ItemStackHandlerMixin.java|ItemStackHandlerMixin]].
+- [StackCounts.sameItemSameComponents](forge-26.3/src/main/java/dev/asp1r/stackunlimiter/api/StackCounts.java) игнорирует только внутренний exact-count при сравнении custom data.
+- [BulkCraftingDispatch](forge-26.3/src/main/java/dev/asp1r/stackunlimiter/internal/BulkCraftingDispatch.java) координирует bulk crafting.
+- Forge-совместимость с capability-инвентарями находится в [ItemStackHandlerMixin](forge-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/ItemStackHandlerMixin.java).
 - Описания GameTest лежат в `src/main/resources/data/stack_unlimiter/test_instance/`.
 
 ### Тесты и сборка
@@ -189,25 +189,25 @@ cd forge-26.3
 ```
 
 - Unit: `src/test/java/dev/asp1r/stackunlimiter/`.
-- Integration: [[forge-26.3/src/main/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java|StackCountGameTests]].
+- Integration: [StackCountGameTests](forge-26.3/src/main/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java).
 - Результат: `forge-26.3/build/libs/`.
 
 ## Fabric 26.3
 
 ### Точки входа
 
-- [[fabric-26.3/src/main/java/dev/asp1r/stackunlimiter/StackUnlimiter.java|StackUnlimiter]].
-- [[fabric-26.3/src/main/resources/fabric.mod.json|fabric.mod.json]].
-- [[fabric-26.3/src/main/resources/stack_unlimiter.mixins.json|Mixin config]].
+- [StackUnlimiter](fabric-26.3/src/main/java/dev/asp1r/stackunlimiter/StackUnlimiter.java).
+- [fabric.mod.json](fabric-26.3/src/main/resources/fabric.mod.json).
+- [Mixin config](fabric-26.3/src/main/resources/stack_unlimiter.mixins.json).
 
 ### Особенности ветки
 
 - Модель exact-count близка к Forge 26.3, но loader-интеграции независимы.
 - Здесь нет Forge `ItemStackHandlerMixin`.
-- [[fabric-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerMenuInteractionMixin.java|AbstractContainerMenuInteractionMixin]] обрабатывает exact-count для ЛКМ, ПКМ, Shift-click, выброса, double-click, number key и drag.
-- [[fabric-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/InventoryMixin.java|InventoryMixin]] отдельно перехватывает выброс всего выбранного хотбар-стака через `removeFromSelected`.
-- [[fabric-26.3/src/main/java/dev/asp1r/stackunlimiter/internal/BulkCraftingDispatch.java|BulkCraftingDispatch]] оставляет массовый крафт авторитетным серверу и не позволяет клиентскому предсказанию повторно обработать результат.
-- [[fabric-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerScreenMixin.java|AbstractContainerScreenMixin]] использует exact-count при предпросмотре drag-распределения.
+- [AbstractContainerMenuInteractionMixin](fabric-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerMenuInteractionMixin.java) обрабатывает exact-count для ЛКМ, ПКМ, Shift-click, выброса, double-click, number key и drag.
+- [InventoryMixin](fabric-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/InventoryMixin.java) отдельно перехватывает выброс всего выбранного хотбар-стака через `removeFromSelected`.
+- [BulkCraftingDispatch](fabric-26.3/src/main/java/dev/asp1r/stackunlimiter/internal/BulkCraftingDispatch.java) оставляет массовый крафт авторитетным серверу и не позволяет клиентскому предсказанию повторно обработать результат.
+- [AbstractContainerScreenMixin](fabric-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerScreenMixin.java) использует exact-count при предпросмотре drag-распределения.
 - Для текста количества нужен непрозрачный ARGB `0xFFFFFFFF`: `0xFFFFFF` имеет нулевой alpha и делает подпись невидимой в Minecraft 26.3.
 - Fabric API используется только source set `src/gametest` для автоматических тестов. Production-код зависит от Fabric Loader и Mixin, поэтому Fabric API не является обязательной зависимостью для игрока и не добавляется в metadata релиза.
 - `net.fabricmc.api.ModInitializer` входит в Fabric Loader, несмотря на имя пакета `fabricmc.api`.
@@ -224,7 +224,7 @@ cd fabric-26.3
 ```
 
 - Unit: `src/test/java/dev/asp1r/stackunlimiter/`.
-- Integration: [[fabric-26.3/src/gametest/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java|StackCountGameTests]].
+- Integration: [StackCountGameTests](fabric-26.3/src/gametest/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java).
 - Подтверждённое состояние `0.1.9`: `test`, `clean build` и все 34 теста, обнаруженные `runGameTest`, проходят.
 - Результат: `fabric-26.3/build/libs/`.
 
@@ -232,20 +232,20 @@ cd fabric-26.3
 
 ### Точки входа
 
-- [[neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/StackUnlimiter.java|StackUnlimiter]] — NeoForge entry point и регистрация GameTest-функций через mod event bus.
-- [[neoforge-26.3/src/main/templates/META-INF/neoforge.mods.toml|neoforge.mods.toml]] — шаблон metadata; итоговый файл генерируется Gradle.
-- [[neoforge-26.3/src/main/resources/stack_unlimiter.mixins.json|Mixin config]].
+- [StackUnlimiter](neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/StackUnlimiter.java) — NeoForge entry point и регистрация GameTest-функций через mod event bus.
+- [neoforge.mods.toml](neoforge-26.3/src/main/templates/META-INF/neoforge.mods.toml) — шаблон metadata; итоговый файл генерируется Gradle.
+- [Mixin config](neoforge-26.3/src/main/resources/stack_unlimiter.mixins.json).
 
 ### Особенности ветки
 
 - Exact-count хранится в `DataComponents.CUSTOM_DATA`; модель и полный набор vanilla-инвентарных операций перенесены из исправленной реализации 26.3.
-- [[neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerMenuInteractionMixin.java|AbstractContainerMenuInteractionMixin]] обрабатывает ЛКМ, ПКМ, Shift-click, number key, double-click, drag и выброс без обрезания до `64`.
-- [[neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerScreenMixin.java|AbstractContainerScreenMixin]] использует exact-count в клиентском предпросмотре drag-распределения.
-- [[neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/internal/BulkCraftingDispatch.java|BulkCraftingDispatch]] координирует серверный массовый крафт.
-- [[neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/InventoryMenuMixin.java|InventoryMenuMixin]] устанавливает crafting player через `CommonHooks` и отправляет NeoForge crafting event через `EventHooks`, сохраняя совместимость bulk crafting с событиями loader.
+- [AbstractContainerMenuInteractionMixin](neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerMenuInteractionMixin.java) обрабатывает ЛКМ, ПКМ, Shift-click, number key, double-click, drag и выброс без обрезания до `64`.
+- [AbstractContainerScreenMixin](neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerScreenMixin.java) использует exact-count в клиентском предпросмотре drag-распределения.
+- [BulkCraftingDispatch](neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/internal/BulkCraftingDispatch.java) координирует серверный массовый крафт.
+- [InventoryMenuMixin](neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/InventoryMenuMixin.java) устанавливает crafting player через `CommonHooks` и отправляет NeoForge crafting event через `EventHooks`, сохраняя совместимость bulk crafting с событиями loader.
 - В NeoForge 26.3 нет legacy Forge `ItemStackHandler`/`IItemHandler`, поэтому Forge-специфичный `ItemStackHandlerMixin` не переносится. Vanilla-инвентари и меню покрыты полностью.
-- [[neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/gametest/GameTestRegistry.java|GameTestRegistry]] регистрирует 33 функции через `DeferredRegister` в `BuiltInRegistries.TEST_FUNCTION`.
-- Data-driven описания находятся в `src/main/resources/data/stack_unlimiter/test_instance/`, а общая пустая структура — в [[neoforge-26.3/src/main/resources/data/stack_unlimiter/structure/empty.nbt|empty.nbt]].
+- [GameTestRegistry](neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/gametest/GameTestRegistry.java) регистрирует 33 функции через `DeferredRegister` в `BuiltInRegistries.TEST_FUNCTION`.
+- Data-driven описания находятся в `src/main/resources/data/stack_unlimiter/test_instance/`, а общая пустая структура — в [empty.nbt](neoforge-26.3/src/main/resources/data/stack_unlimiter/structure/empty.nbt).
 
 ### Тесты и сборка
 
@@ -261,13 +261,13 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 ```
 
 - Unit: `src/test/java/dev/asp1r/stackunlimiter/`.
-- Integration: [[neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java|StackCountGameTests]].
+- Integration: [StackCountGameTests](neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java).
 - Подтверждённое состояние `0.1.9`: `test`, `clean build` и все 34 теста, обнаруженные `runGameTestServer`, проходят.
 - Результат: `neoforge-26.3/build/libs/`.
 
 ### Публикация
 
-- Modrinth и CurseForge: `0.1.9` загружен как Release с display name `Stack Unlimiter 0.1.9 — NeoForge 26.3` и одинаковым changelog из [[RELEASE_CHANGELOGS#NeoForge 26.3 — 0.1.9]].
+- Modrinth и CurseForge: `0.1.9` загружен как Release с display name `Stack Unlimiter 0.1.9 — NeoForge 26.3` и одинаковым changelog из [NeoForge 26.3 — 0.1.9](RELEASE_CHANGELOGS.md).
 
 ## Диагностические маршруты
 
@@ -280,7 +280,7 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 5. Проверить, что клиент применил exact-count.
 6. Проверить отрисовку: значения `65–999` не должны уходить в ванильный `getCount()`.
 
-Начальные файлы: [[forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/InventoryMixin.java|InventoryMixin]], [[forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerMenuInteractionMixin.java|AbstractContainerMenuInteractionMixin]], [[forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/FriendlyByteBufMixin.java|FriendlyByteBufMixin]], [[forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/GuiGraphicsMixin.java|GuiGraphicsMixin]].
+Начальные файлы: [InventoryMixin](forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/InventoryMixin.java), [AbstractContainerMenuInteractionMixin](forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerMenuInteractionMixin.java), [FriendlyByteBufMixin](forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/FriendlyByteBufMixin.java), [GuiGraphicsMixin](forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/GuiGraphicsMixin.java).
 
 ### Переносится только 64 предмета
 
@@ -335,7 +335,7 @@ StackedContents → ServerPlaceRecipe → crafting grid → result slot → bulk
 > 3. Исправить причину, а не только визуальный симптом.
 > 4. Запустить unit-тесты и GameTest нужного модуля.
 > 5. Выполнить `clean build`.
-> 6. Если менялся код или поведение мода — повысить версию модуля и обновить таблицу в [[README]]. Документация и публикационные файлы версию не повышают.
+> 6. Если менялся код или поведение мода — повысить версию модуля и обновить таблицу в [README](README.md). Документация и публикационные файлы версию не повышают.
 > 7. Проверить версию и Minecraft range внутри JAR.
 > 8. Обновить эту карту, если изменились структура, версия, тестовая матрица, сборка, диагностика или важное техническое решение.
 > 9. Не добавлять `artwork/` и `.obsidian/` в коммит без отдельного запроса.
@@ -344,7 +344,7 @@ StackedContents → ServerPlaceRecipe → crafting grid → result slot → bulk
 ### Рабочий цикл публикации
 
 1. Сверить версию JAR и пару Minecraft + loader с таблицей модулей.
-2. Взять точный текст из [[RELEASE_CHANGELOGS]].
+2. Взять точный текст из [RELEASE_CHANGELOGS](RELEASE_CHANGELOGS.md).
 3. После подготовки нового текста сразу записать его в каталог с указанием площадки.
 4. Не добавлять конкретную версию Minecraft в общее описание проекта.
 5. Не повышать версию мода при изменении только публикационных документов.
@@ -358,6 +358,6 @@ StackedContents → ServerPlaceRecipe → crafting grid → result slot → bulk
 - диагностический маршрут оказался неполным.
 - изменились версия модуля, покрытие операций или подтверждённое состояние тестов;
 - обнаружена полезная причина бага или ограничение конкретной версии Minecraft/loader.
-- подготовлен или изменён changelog релиза — обновить [[RELEASE_CHANGELOGS]] и ссылку из таблицы модулей;
+- подготовлен или изменён changelog релиза — обновить [RELEASE_CHANGELOGS](RELEASE_CHANGELOGS.md) и ссылку из таблицы модулей;
 
-Версии в таблице модулей — снимок состояния. Источник истины всегда находится в соответствующем `gradle.properties` и в [[README#Available builds|таблице сборок README]].
+Версии в таблице модулей — снимок состояния. Источник истины всегда находится в соответствующем `gradle.properties` и в [таблице сборок README](README.md#available-builds).
