@@ -142,7 +142,7 @@ Stack Unlimiter is now available for Forge on Minecraft 26.3.
 ```markdown
 # Initial Fabric release
 
-Stack Unlimiter is now available for Fabric.
+Stack Unlimiter is now available for Fabric on Minecraft 1.20.1.
 
 ## Features
 
