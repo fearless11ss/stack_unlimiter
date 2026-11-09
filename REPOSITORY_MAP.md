@@ -41,7 +41,7 @@ updated: 2026-11-09
 | --- | --- | --- | --- | --- | --- | --- |
 | `forge-1.20.1` | 1.20.1 | Forge | 17 | `0.1.11` | Inventory fixes | загружен на Modrinth и CurseForge |
 | `fabric-1.20.1` | 1.20.1 | Fabric | 17 | `0.1.12` | Initial Fabric release | загружен на Modrinth и CurseForge |
-| `forge-1.21` | 1.21 | Forge | 21 | `0.1.13` | Initial Forge 1.21 release | собран и протестирован, ещё не опубликован |
+| `forge-1.21` | 1.21 | Forge | 21 | `0.1.13` | Initial Forge 1.21 release | загружен на Modrinth и CurseForge |
 | `forge-26.3` | 26.3 | Forge | 25 | `0.1.16` | Initial Forge 26.3 release | загружен на Modrinth и CurseForge |
 | `fabric-26.3` | 26.3 | Fabric | 25+ для Gradle | `0.1.9` | Initial Fabric release | загружен на Modrinth и CurseForge |
 | `neoforge-26.3` | 26.3 | NeoForge | 25 | `0.1.9` | Initial NeoForge release | загружен на Modrinth и CurseForge |
@@ -205,7 +205,7 @@ cd forge-1.21
 
 ### Публикация
 
-- Текст для Modrinth и CurseForge подготовлен в [каталоге релизов](RELEASE_CHANGELOGS.md); файл ещё не опубликован.
+- Modrinth и CurseForge: `0.1.13` загружен как Release с display name `Stack Unlimiter 0.1.13 — Forge 1.21`, Minecraft `1.21`, loader `Forge`, окружением Client + Server и changelog из [каталога релизов](RELEASE_CHANGELOGS.md).
 
 ## Forge 26.3
 
