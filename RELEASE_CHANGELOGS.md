@@ -30,7 +30,7 @@ updated: 2026-11-10
 | 1.21 | Forge | `0.1.14` | 21 | — | не публиковался; заменён `0.1.15` | Non-stackable `/give` fix |
 | 1.21 | Forge | `0.1.15` | 21 | Modrinth, CurseForge | загружен | Inventory and shulker tooltip fixes |
 | 1.21 | Fabric | `0.1.15` | 21 | Modrinth, CurseForge | загружен | Initial Fabric 1.21 release |
-| 1.21 | Fabric | `0.1.16` | 21 | Modrinth, CurseForge | текст подготовлен | Inventory and shulker tooltip fixes |
+| 1.21 | Fabric | `0.1.16` | 21 | Modrinth, CurseForge | загружен | Inventory and shulker tooltip fixes |
 | 1.21 | NeoForge | `0.1.17` | 21 | Modrinth, CurseForge | загружен | Initial NeoForge 1.21 release |
 | 1.21 | NeoForge | `0.1.18` | 21 | Modrinth, CurseForge | загружен | Shulker tooltip count fix |
 | 26.3 | Forge | `0.1.16` | 25 | Modrinth, CurseForge | загружен | Initial Forge 26.3 release |
@@ -38,7 +38,7 @@ updated: 2026-11-10
 | 26.3 | NeoForge | `0.1.9` | 25 | Modrinth, CurseForge | загружен | Initial NeoForge release |
 
 > [!success] Ранее опубликованные сборки загружены
-> Forge 1.20.1 `0.1.11`, Fabric 1.20.1 `0.1.12`, Forge 1.21 `0.1.15`, Fabric 1.21 `0.1.15`, NeoForge 1.21 `0.1.18`, Forge 26.3 `0.1.16`, Fabric 26.3 `0.1.9` и NeoForge 26.3 `0.1.9` загружены на Modrinth и CurseForge.
+> Forge 1.20.1 `0.1.11`, Fabric 1.20.1 `0.1.12`, Forge 1.21 `0.1.15`, Fabric 1.21 `0.1.16`, NeoForge 1.21 `0.1.18`, Forge 26.3 `0.1.16`, Fabric 26.3 `0.1.9` и NeoForge 26.3 `0.1.9` загружены на Modrinth и CurseForge.
 
 ## Общие поля публикации
 
@@ -254,8 +254,8 @@ Stack Unlimiter is now available for Fabric on Minecraft 1.21.
 
 ## Fabric 1.21 — 0.1.16
 
-> [!info] Текст подготовлен для публикации
-> Используй display name `Stack Unlimiter 0.1.16 — Fabric 1.21`, Minecraft `1.21`, loader `Fabric`, Java 21, окружение Client + Server, тип Release и без обязательной зависимости от Fabric API.
+> [!success] Загрузка на Modrinth и CurseForge подтверждена
+> Файл загружен на обе площадки как Release с display name `Stack Unlimiter 0.1.16 — Fabric 1.21`, Minecraft `1.21`, loader `Fabric`, Java 21, окружением Client + Server и без обязательной зависимости от Fabric API.
 
 ```markdown
 # Inventory and shulker tooltip fixes

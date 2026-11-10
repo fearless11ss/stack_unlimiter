@@ -44,7 +44,7 @@ updated: 2026-11-10
 | `forge-1.20.1` | 1.20.1 | Forge | 17 | `0.1.11` | Inventory fixes | загружен на Modrinth и CurseForge |
 | `fabric-1.20.1` | 1.20.1 | Fabric | 17 | `0.1.12` | Initial Fabric release | загружен на Modrinth и CurseForge |
 | `forge-1.21` | 1.21 | Forge | 21 | `0.1.15` | Inventory and shulker tooltip fixes | загружен на Modrinth и CurseForge |
-| `fabric-1.21` | 1.21 | Fabric | 21 | `0.1.16` | Inventory and shulker tooltip fixes | собран; `0.1.15` загружен на Modrinth и CurseForge |
+| `fabric-1.21` | 1.21 | Fabric | 21 | `0.1.16` | Inventory and shulker tooltip fixes | загружен на Modrinth и CurseForge |
 | `neoforge-1.21` | 1.21 | NeoForge | 21 | `0.1.18` | Shulker tooltip count fix | загружен на Modrinth и CurseForge |
 | `forge-26.3` | 26.3 | Forge | 25 | `0.1.16` | Initial Forge 26.3 release | загружен на Modrinth и CurseForge |
 | `fabric-26.3` | 26.3 | Fabric | 25+ для Gradle | `0.1.9` | Initial Fabric release | загружен на Modrinth и CurseForge |
@@ -261,7 +261,7 @@ cd fabric-1.21
 ### Публикация
 
 - Modrinth и CurseForge: `0.1.15` загружен как Release с display name `Stack Unlimiter 0.1.15 — Fabric 1.21`, Minecraft `1.21`, loader `Fabric`, окружением Client + Server и changelog из [каталога релизов](RELEASE_CHANGELOGS.md).
-- Исправление `0.1.16` собрано и проверено, но ещё не загружено на площадки.
+- Modrinth и CurseForge: `0.1.16` загружен как Release с display name `Stack Unlimiter 0.1.16 — Fabric 1.21`, Minecraft `1.21`, loader `Fabric`, Java 21, окружением Client + Server, без обязательной зависимости от Fabric API и с changelog из [каталога релизов](RELEASE_CHANGELOGS.md).
 
 ## NeoForge 1.21
 
