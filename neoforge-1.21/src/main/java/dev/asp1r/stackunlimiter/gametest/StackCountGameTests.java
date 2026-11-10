@@ -7,6 +7,7 @@ import dev.asp1r.stackunlimiter.api.StackCounts;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -14,6 +15,8 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.game.ClientboundContainerSetContentPacket;
 import net.minecraft.resources.RegistryOps;
@@ -31,14 +34,18 @@ import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.ContainerSynchronizer;
 import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -84,6 +91,41 @@ public final class StackCountGameTests {
         }
 
         helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void shulkerTooltipUsesExactContainedCount(GameTestHelper helper) {
+        ItemStack planks = new ItemStack(Items.OAK_PLANKS, 64);
+        StackCounts.set(planks, 400_000L);
+
+        ItemStack shulker = new ItemStack(Items.SHULKER_BOX);
+        shulker.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(List.of(planks)));
+
+        ItemStack stored = shulker.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY)
+                .nonEmptyItems()
+                .iterator()
+                .next();
+        assertEquals(400_000L, StackCounts.get(stored), "exact count stored inside shulker");
+
+        List<Component> tooltip = new ArrayList<>();
+        shulker.getItem().appendHoverText(
+                shulker,
+                Item.TooltipContext.of(helper.getLevel()),
+                tooltip,
+                TooltipFlag.NORMAL
+        );
+
+        for (Component line : tooltip) {
+            if (line.getContents() instanceof TranslatableContents contents
+                    && contents.getKey().equals("container.shulkerBox.itemCount")) {
+                Object displayedCount = contents.getArgs()[1];
+                assertEquals(400_000L, ((Number) displayedCount).longValue(),
+                        "shulker tooltip contained count");
+                helper.succeed();
+                return;
+            }
+        }
+        throw new GameTestAssertException("shulker tooltip item-count line was not generated");
     }
 
     @GameTest(template = "empty")

@@ -11,6 +11,7 @@
     "ItemStackHandlerMixin",
     "ItemStackMixin",
     "ServerPlaceRecipeMixin",
+    "ShulkerBoxBlockMixin",
     "SlotMixin",
     "StackedContentsMixin"
   ],

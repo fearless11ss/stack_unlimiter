@@ -45,7 +45,7 @@ updated: 2026-11-10
 | `fabric-1.20.1` | 1.20.1 | Fabric | 17 | `0.1.12` | Initial Fabric release | загружен на Modrinth и CurseForge |
 | `forge-1.21` | 1.21 | Forge | 21 | `0.1.15` | Inventory and shulker tooltip fixes | собран; `0.1.13` загружен на Modrinth и CurseForge |
 | `fabric-1.21` | 1.21 | Fabric | 21 | `0.1.15` | Initial Fabric 1.21 release | загружен на Modrinth и CurseForge |
-| `neoforge-1.21` | 1.21 | NeoForge | 21 | `0.1.17` | Initial NeoForge 1.21 release | загружен на Modrinth и CurseForge |
+| `neoforge-1.21` | 1.21 | NeoForge | 21 | `0.1.18` | Shulker tooltip count fix | собран; `0.1.17` загружен на Modrinth и CurseForge |
 | `forge-26.3` | 26.3 | Forge | 25 | `0.1.16` | Initial Forge 26.3 release | загружен на Modrinth и CurseForge |
 | `fabric-26.3` | 26.3 | Fabric | 25+ для Gradle | `0.1.9` | Initial Fabric release | загружен на Modrinth и CurseForge |
 | `neoforge-26.3` | 26.3 | NeoForge | 25 | `0.1.9` | Initial NeoForge release | загружен на Modrinth и CurseForge |
@@ -274,6 +274,7 @@ cd fabric-1.21
 - [InventoryMenuMixin](neoforge-1.21/src/main/java/dev/asp1r/stackunlimiter/mixin/InventoryMenuMixin.java) использует `CommonHooks` и `EventHooks` для совместимого массового Shift-крафта.
 - NeoForge-совместимость с handler-инвентарями находится в [ItemStackHandlerMixin](neoforge-1.21/src/main/java/dev/asp1r/stackunlimiter/mixin/ItemStackHandlerMixin.java).
 - [StackCounts.copyWithCount](neoforge-1.21/src/main/java/dev/asp1r/stackunlimiter/api/StackCounts.java) сохраняет тип предмета у нулевой копии, чтобы ванильный `Inventory.add` корректно выдавал принципиально нестакаемые инструменты и шалкеровые ящики.
+- [ShulkerBoxBlockMixin](neoforge-1.21/src/main/java/dev/asp1r/stackunlimiter/mixin/ShulkerBoxBlockMixin.java) заменяет фасадное количество `64` в строках содержимого шалкера на сохранённый exact-count типа `long`.
 - Все mixin используют Mojang-имена NeoForge напрямую (`remap = false`); refmap этой ветке не нужен.
 
 ### Тесты и сборка
@@ -287,15 +288,17 @@ cd neoforge-1.21
 
 - Unit: [LongCountMathTest](neoforge-1.21/src/test/java/dev/asp1r/stackunlimiter/internal/LongCountMathTest.java), [StackCountDisplayTest](neoforge-1.21/src/test/java/dev/asp1r/stackunlimiter/client/StackCountDisplayTest.java).
 - Integration: [StackCountGameTests](neoforge-1.21/src/main/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java).
-- Подтверждённое состояние `0.1.17`: unit-тесты, `clean build` и все 24 обязательных теста `runGameTestServer` проходят.
+- Подтверждённое состояние `0.1.18`: unit-тесты, `clean build` и все 25 обязательных тестов `runGameTestServer` проходят.
 - Регрессионный тест проверяет `/give` для алмазной кирки и шалкерового ящика на сервере и после сетевой сериализации инвентаря.
-- JAR: `neoforge-1.21/build/libs/stack_unlimiter-neoforge-1.21-0.1.17.jar`.
+- Регрессионный тест шалкера подтверждает, что exact-count `400000` сохраняется внутри компонента и отображается в tooltip без подмены на `64`.
+- JAR: `neoforge-1.21/build/libs/stack_unlimiter-neoforge-1.21-0.1.18.jar`.
 - Metadata JAR: Minecraft строго `1.21`, NeoForge `>=21.0.167`, Java 21; class-file version `65`.
-- SHA-256: `85C2249628B98590CEA62DFD515BA5451D08885EE09D0E9DAAD328CFE5E007C2`.
+- SHA-256: `BC61E8AD199F498E522DCFBCD6723198C1CDA7B4F61391E66BFF2B76961DF3BE`.
 
 ### Публикация
 
 - Modrinth и CurseForge: `0.1.17` загружен как Release с display name `Stack Unlimiter 0.1.17 — NeoForge 1.21`, Minecraft `1.21`, loader `NeoForge`, Java 21, окружением Client + Server и changelog из [каталога релизов](RELEASE_CHANGELOGS.md).
+- Исправление `0.1.18` собрано и проверено, но ещё не загружено на площадки.
 
 ## Forge 26.3
 
@@ -421,7 +424,7 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 3. Исправлять нужно числовой аргумент `container.shulkerBox.itemCount`, не меняя глобальную семантику `getCount()` и остальные строки tooltip.
 4. Регрессионный тест должен отдельно проверять сохранённое значение и сформированный аргумент перевода.
 
-В Forge 1.21 отображение исправлено в `0.1.15`.
+В Forge 1.21 отображение исправлено в `0.1.15`, а в NeoForge 1.21 — в `0.1.18`.
 
 ### Fabric запускается в dev, но падает в обычном лаунчере
 

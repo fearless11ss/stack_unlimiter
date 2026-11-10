@@ -31,6 +31,7 @@ updated: 2026-11-10
 | 1.21 | Forge | `0.1.15` | 21 | Modrinth, CurseForge | текст подготовлен | Inventory and shulker tooltip fixes |
 | 1.21 | Fabric | `0.1.15` | 21 | Modrinth, CurseForge | загружен | Initial Fabric 1.21 release |
 | 1.21 | NeoForge | `0.1.17` | 21 | Modrinth, CurseForge | загружен | Initial NeoForge 1.21 release |
+| 1.21 | NeoForge | `0.1.18` | 21 | Modrinth, CurseForge | текст подготовлен | Shulker tooltip count fix |
 | 26.3 | Forge | `0.1.16` | 25 | Modrinth, CurseForge | загружен | Initial Forge 26.3 release |
 | 26.3 | Fabric | `0.1.9` | 25 | Modrinth, CurseForge | загружен | Initial Fabric release |
 | 26.3 | NeoForge | `0.1.9` | 25 | Modrinth, CurseForge | загружен | Initial NeoForge release |
@@ -275,6 +276,27 @@ Stack Unlimiter is now available for NeoForge on Minecraft 1.21.
 ## Fixes included
 
 - Fixed `/give` silently losing intentionally non-stackable items such as tools and shulker boxes
+
+## Important
+
+- The mod must be installed on both the client and server
+- Worlds containing oversized stacks depend on this mod
+- Back up your worlds before installing or updating
+- Compatibility with every mod is not guaranteed
+```
+
+## NeoForge 1.21 — 0.1.18
+
+> [!info] Текст подготовлен для публикации
+> Используй display name `Stack Unlimiter 0.1.18 — NeoForge 1.21`, Minecraft `1.21`, loader `NeoForge`, Java 21, окружение Client + Server, тип Release и без дополнительных зависимостей.
+
+```markdown
+# Shulker tooltip count fix
+
+## Fixed
+
+- Fixed shulker-box tooltips displaying `64` instead of the exact contained stack count
+- Preserved signed 64-bit counts when displaying shulker-box contents
 
 ## Important
 
