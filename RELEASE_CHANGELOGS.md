@@ -28,7 +28,7 @@ updated: 2026-11-10
 | 1.20.1 | Fabric | `0.1.12` | 17 | Modrinth, CurseForge | загружен | Initial Fabric release |
 | 1.21 | Forge | `0.1.13` | 21 | Modrinth, CurseForge | загружен | Initial Forge 1.21 release |
 | 1.21 | Fabric | `0.1.15` | 21 | Modrinth, CurseForge | загружен | Initial Fabric 1.21 release |
-| 1.21 | NeoForge | `0.1.16` | 21 | Modrinth, CurseForge | текст подготовлен | Initial NeoForge 1.21 release |
+| 1.21 | NeoForge | `0.1.17` | 21 | Modrinth, CurseForge | текст подготовлен | Initial NeoForge 1.21 release |
 | 26.3 | Forge | `0.1.16` | 25 | Modrinth, CurseForge | загружен | Initial Forge 26.3 release |
 | 26.3 | Fabric | `0.1.9` | 25 | Modrinth, CurseForge | загружен | Initial Fabric release |
 | 26.3 | NeoForge | `0.1.9` | 25 | Modrinth, CurseForge | загружен | Initial NeoForge release |
@@ -202,10 +202,10 @@ Stack Unlimiter is now available for Fabric on Minecraft 1.21.
 - Compatibility with every mod is not guaranteed
 ```
 
-## NeoForge 1.21 — 0.1.16
+## NeoForge 1.21 — 0.1.17
 
 > [!info] Текст подготовлен для публикации
-> Использовать для Modrinth и CurseForge с display name `Stack Unlimiter 0.1.16 — NeoForge 1.21`, Minecraft `1.21`, loader `NeoForge`, Java 21 и окружением Client + Server.
+> Использовать для Modrinth и CurseForge с display name `Stack Unlimiter 0.1.17 — NeoForge 1.21`, Minecraft `1.21`, loader `NeoForge`, Java 21 и окружением Client + Server.
 
 ```markdown
 # Initial NeoForge release for Minecraft 1.21
@@ -223,6 +223,10 @@ Stack Unlimiter is now available for NeoForge on Minecraft 1.21.
 - Supports crafting, bulk Shift-click crafting, and recipe-book placement
 - Displays large stack counts using compact labels
 - Preserves oversized stacks during saving and synchronization
+
+## Fixes included
+
+- Fixed `/give` silently losing intentionally non-stackable items such as tools and shulker boxes
 
 ## Important
 

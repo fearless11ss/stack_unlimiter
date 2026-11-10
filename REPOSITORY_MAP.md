@@ -45,7 +45,7 @@ updated: 2026-11-10
 | `fabric-1.20.1` | 1.20.1 | Fabric | 17 | `0.1.12` | Initial Fabric release | загружен на Modrinth и CurseForge |
 | `forge-1.21` | 1.21 | Forge | 21 | `0.1.13` | Initial Forge 1.21 release | загружен на Modrinth и CurseForge |
 | `fabric-1.21` | 1.21 | Fabric | 21 | `0.1.15` | Initial Fabric 1.21 release | загружен на Modrinth и CurseForge |
-| `neoforge-1.21` | 1.21 | NeoForge | 21 | `0.1.16` | Initial NeoForge 1.21 release | собран, 23 GameTest проходят; публикация не начата |
+| `neoforge-1.21` | 1.21 | NeoForge | 21 | `0.1.17` | Initial NeoForge 1.21 release | собран, 24 GameTest проходят; публикация не начата |
 | `forge-26.3` | 26.3 | Forge | 25 | `0.1.16` | Initial Forge 26.3 release | загружен на Modrinth и CurseForge |
 | `fabric-26.3` | 26.3 | Fabric | 25+ для Gradle | `0.1.9` | Initial Fabric release | загружен на Modrinth и CurseForge |
 | `neoforge-26.3` | 26.3 | NeoForge | 25 | `0.1.9` | Initial NeoForge release | загружен на Modrinth и CurseForge |
@@ -266,6 +266,7 @@ cd fabric-1.21
 - [ServerPlaceRecipeMixin](neoforge-1.21/src/main/java/dev/asp1r/stackunlimiter/mixin/ServerPlaceRecipeMixin.java) сохраняет exact-count при переносе ингредиентов через recipe book.
 - [InventoryMenuMixin](neoforge-1.21/src/main/java/dev/asp1r/stackunlimiter/mixin/InventoryMenuMixin.java) использует `CommonHooks` и `EventHooks` для совместимого массового Shift-крафта.
 - NeoForge-совместимость с handler-инвентарями находится в [ItemStackHandlerMixin](neoforge-1.21/src/main/java/dev/asp1r/stackunlimiter/mixin/ItemStackHandlerMixin.java).
+- [StackCounts.copyWithCount](neoforge-1.21/src/main/java/dev/asp1r/stackunlimiter/api/StackCounts.java) сохраняет тип предмета у нулевой копии, чтобы ванильный `Inventory.add` корректно выдавал принципиально нестакаемые инструменты и шалкеровые ящики.
 - Все mixin используют Mojang-имена NeoForge напрямую (`remap = false`); refmap этой ветке не нужен.
 
 ### Тесты и сборка
@@ -279,10 +280,11 @@ cd neoforge-1.21
 
 - Unit: [LongCountMathTest](neoforge-1.21/src/test/java/dev/asp1r/stackunlimiter/internal/LongCountMathTest.java), [StackCountDisplayTest](neoforge-1.21/src/test/java/dev/asp1r/stackunlimiter/client/StackCountDisplayTest.java).
 - Integration: [StackCountGameTests](neoforge-1.21/src/main/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java).
-- Подтверждённое состояние `0.1.16`: unit-тесты, `build` и все 23 обязательных теста `runGameTestServer` проходят.
-- JAR: `neoforge-1.21/build/libs/stack_unlimiter-neoforge-1.21-0.1.16.jar`.
+- Подтверждённое состояние `0.1.17`: unit-тесты, `clean build` и все 24 обязательных теста `runGameTestServer` проходят.
+- Регрессионный тест проверяет `/give` для алмазной кирки и шалкерового ящика на сервере и после сетевой сериализации инвентаря.
+- JAR: `neoforge-1.21/build/libs/stack_unlimiter-neoforge-1.21-0.1.17.jar`.
 - Metadata JAR: Minecraft строго `1.21`, NeoForge `>=21.0.167`, Java 21; class-file version `65`.
-- SHA-256: `387243EBC07C195AE82C17F5DDC2655FEA35D5ED936B55579A6824B609AD535C`.
+- SHA-256: `85C2249628B98590CEA62DFD515BA5451D08885EE09D0E9DAAD328CFE5E007C2`.
 
 ### Публикация
 
@@ -395,6 +397,15 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 - Modrinth и CurseForge: `0.1.9` загружен как Release с display name `Stack Unlimiter 0.1.9 — NeoForge 26.3` и одинаковым changelog из [NeoForge 26.3 — 0.1.9](RELEASE_CHANGELOGS.md).
 
 ## Диагностические маршруты
+
+### `/give` сообщает об успехе, но нестакаемый предмет отсутствует
+
+1. Проверить фактическое содержимое серверного `Inventory`, а не только сообщение команды.
+2. Проверить `ItemStack.copyWithCount(0)`: ванильный `Inventory.add` использует нулевую типизированную копию как заготовку нового слота.
+3. Нельзя возвращать глобальный `ItemStack.EMPTY`, иначе последующий `grow` изменит singleton пустого стака и предмет потеряется.
+4. Регрессионный тест должен проверять инструмент и шалкеровый ящик как на сервере, так и после сетевой сериализации меню.
+
+В NeoForge 1.21 ошибка исправлена в `0.1.17`. При переносе исправления в другие ветки с компонентной моделью `ItemStack` нужен отдельный полный прогон их GameTest.
 
 ### Fabric запускается в dev, но падает в обычном лаунчере
 
