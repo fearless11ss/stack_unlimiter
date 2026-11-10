@@ -8,7 +8,7 @@ tags:
   - releases
   - publishing
 status: active
-updated: 2026-11-09
+updated: 2026-11-10
 ---
 
 # Stack Unlimiter — каталог релизных changelog
@@ -27,6 +27,7 @@ updated: 2026-11-09
 | 1.20.1 | Forge | `0.1.11` | 17 | Modrinth, CurseForge | загружен | Inventory fixes |
 | 1.20.1 | Fabric | `0.1.12` | 17 | Modrinth, CurseForge | загружен | Initial Fabric release |
 | 1.21 | Forge | `0.1.13` | 21 | Modrinth, CurseForge | загружен | Initial Forge 1.21 release |
+| 1.21 | Fabric | `0.1.14` | 21 | Modrinth, CurseForge | текст подготовлен, файл не загружен | Initial Fabric 1.21 release |
 | 26.3 | Forge | `0.1.16` | 25 | Modrinth, CurseForge | загружен | Initial Forge 26.3 release |
 | 26.3 | Fabric | `0.1.9` | 25 | Modrinth, CurseForge | загружен | Initial Fabric release |
 | 26.3 | NeoForge | `0.1.9` | 25 | Modrinth, CurseForge | загружен | Initial NeoForge release |
@@ -156,6 +157,37 @@ Stack Unlimiter is now available for Forge on Minecraft 26.3.
 - Splits oversized stacks using their exact count
 - Keeps bulk crafting authoritative on the server
 - Uses exact counts for drag previews, double-click collection, and nearby item pickup
+
+## Important
+
+- The mod must be installed on both the client and server
+- Worlds containing oversized stacks depend on this mod
+- Back up your worlds before installing or updating
+- Compatibility with every mod is not guaranteed
+```
+
+## Fabric 1.21 — 0.1.14
+
+> [!info] Текст подготовлен для Modrinth и CurseForge
+> Рекомендуемый display name: `Stack Unlimiter 0.1.14 — Fabric 1.21`. Файл ещё не опубликован.
+
+```markdown
+# Initial Fabric release for Minecraft 1.21
+
+Stack Unlimiter is now available for Fabric on Minecraft 1.21.
+
+## Features
+
+- Supports stackable item counts beyond the vanilla limit of 64
+- Stores exact stack counts using signed 64-bit values
+- Keeps intentionally non-stackable items non-stackable
+- Supports player inventories and vanilla containers
+- Supports item pickup, dropping, `/give`, and standard inventory interactions
+- Supports left-click, right-click, Shift-click, number keys, double-click, and drag distribution
+- Supports crafting, bulk Shift-click crafting, and recipe-book placement
+- Displays large stack counts using compact labels
+- Preserves oversized stacks during saving and synchronization
+- Does not require Fabric API at runtime
 
 ## Important
 

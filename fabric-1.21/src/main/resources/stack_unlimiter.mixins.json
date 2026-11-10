@@ -1,0 +1,23 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.asp1r.stackunlimiter.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "AbstractContainerMenuInteractionMixin",
+    "GiveCommandMixin",
+    "InventoryMixin",
+    "InventoryMenuMixin",
+    "ItemStackMixin",
+    "ServerPlaceRecipeMixin",
+    "SlotMixin",
+    "StackedContentsMixin"
+  ],
+  "client": [
+    "AbstractContainerScreenMixin",
+    "GuiGraphicsMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -15,6 +15,7 @@ depend on the mod and should be backed up before installation or updates.
 | [`forge-1.20.1`](forge-1.20.1/) | 1.20.1 | Forge | 0.1.11 | 17 |
 | [`fabric-1.20.1`](fabric-1.20.1/) | 1.20.1 | Fabric | 0.1.12 | 17 |
 | [`forge-1.21`](forge-1.21/) | 1.21 | Forge | 0.1.13 | 21 |
+| [`fabric-1.21`](fabric-1.21/) | 1.21 | Fabric | 0.1.14 | 21 |
 | [`forge-26.3`](forge-26.3/) | 26.3 | Forge | 0.1.16 | 25 |
 | [`fabric-26.3`](fabric-26.3/) | 26.3 | Fabric | 0.1.9 | 25 |
 | [`neoforge-26.3`](neoforge-26.3/) | 26.3 | NeoForge | 0.1.9 | 25 |
@@ -42,6 +43,9 @@ cd ..\fabric-1.20.1
 cd ..\forge-1.21
 .\gradlew.bat clean build
 
+cd ..\fabric-1.21
+.\gradlew.bat clean build
+
 cd ..\forge-26.3
 .\gradlew.bat clean build
 
@@ -56,8 +60,8 @@ On Linux or macOS, use `./gradlew` instead. The resulting JAR is written to the
 selected module's `build/libs` directory.
 
 Fabric 26.3 requires the Gradle process itself to run on Java 25. Forge 26.3
-and NeoForge 26.3 use Java 25 toolchains. Forge 1.21 targets Java 21, while
-Forge and Fabric 1.20.1 target Java 17.
+and NeoForge 26.3 use Java 25 toolchains. Forge and Fabric 1.21 target Java 21,
+while Forge and Fabric 1.20.1 target Java 17.
 
 ## Implemented behavior
 
