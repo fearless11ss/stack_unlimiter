@@ -28,13 +28,13 @@ updated: 2026-11-10
 | 1.20.1 | Fabric | `0.1.12` | 17 | Modrinth, CurseForge | загружен | Initial Fabric release |
 | 1.21 | Forge | `0.1.13` | 21 | Modrinth, CurseForge | загружен | Initial Forge 1.21 release |
 | 1.21 | Fabric | `0.1.15` | 21 | Modrinth, CurseForge | загружен | Initial Fabric 1.21 release |
-| 1.21 | NeoForge | `0.1.17` | 21 | Modrinth, CurseForge | текст подготовлен | Initial NeoForge 1.21 release |
+| 1.21 | NeoForge | `0.1.17` | 21 | Modrinth, CurseForge | загружен | Initial NeoForge 1.21 release |
 | 26.3 | Forge | `0.1.16` | 25 | Modrinth, CurseForge | загружен | Initial Forge 26.3 release |
 | 26.3 | Fabric | `0.1.9` | 25 | Modrinth, CurseForge | загружен | Initial Fabric release |
 | 26.3 | NeoForge | `0.1.9` | 25 | Modrinth, CurseForge | загружен | Initial NeoForge release |
 
 > [!success] Ранее опубликованные сборки загружены
-> Forge 1.20.1 `0.1.11`, Fabric 1.20.1 `0.1.12`, Forge 1.21 `0.1.13`, Fabric 1.21 `0.1.15`, Forge 26.3 `0.1.16`, Fabric 26.3 `0.1.9` и NeoForge 26.3 `0.1.9` загружены на Modrinth и CurseForge.
+> Forge 1.20.1 `0.1.11`, Fabric 1.20.1 `0.1.12`, Forge 1.21 `0.1.13`, Fabric 1.21 `0.1.15`, NeoForge 1.21 `0.1.17`, Forge 26.3 `0.1.16`, Fabric 26.3 `0.1.9` и NeoForge 26.3 `0.1.9` загружены на Modrinth и CurseForge.
 
 ## Общие поля публикации
 
@@ -204,8 +204,8 @@ Stack Unlimiter is now available for Fabric on Minecraft 1.21.
 
 ## NeoForge 1.21 — 0.1.17
 
-> [!info] Текст подготовлен для публикации
-> Использовать для Modrinth и CurseForge с display name `Stack Unlimiter 0.1.17 — NeoForge 1.21`, Minecraft `1.21`, loader `NeoForge`, Java 21 и окружением Client + Server.
+> [!success] Загрузка на Modrinth и CurseForge подтверждена
+> Файл загружен на обе площадки как Release с display name `Stack Unlimiter 0.1.17 — NeoForge 1.21`, Minecraft `1.21`, loader `NeoForge`, Java 21 и окружением Client + Server.
 
 ```markdown
 # Initial NeoForge release for Minecraft 1.21
