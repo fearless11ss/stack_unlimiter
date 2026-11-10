@@ -114,6 +114,15 @@ def verifyRemappedMixinRefmap = tasks.register('verifyRemappedMixinRefmap') {
                             + 'the remapped release JAR will crash outside the development environment'
             )
         }
+        def shulkerBoxMixin = intermediaryMappings?.get(
+                'dev/asp1r/stackunlimiter/mixin/ShulkerBoxBlockMixin'
+        )
+        if (!shulkerBoxMixin?.get('appendHoverText')) {
+            throw new GradleException(
+                    'ShulkerBoxBlockMixin.appendHoverText is absent from the named-to-intermediary refmap; '
+                            + 'the remapped release JAR will not display exact shulker counts'
+            )
+        }
     }
 }
 

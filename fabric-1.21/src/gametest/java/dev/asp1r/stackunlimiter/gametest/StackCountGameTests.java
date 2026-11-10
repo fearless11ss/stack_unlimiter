@@ -7,6 +7,7 @@ import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -14,6 +15,8 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.game.ClientboundContainerSetContentPacket;
 import net.minecraft.resources.RegistryOps;
@@ -31,11 +34,15 @@ import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.ContainerSynchronizer;
 import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.phys.AABB;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -84,20 +91,7 @@ public final class StackCountGameTests implements FabricGameTest {
         ServerPlayer player = stackUnlimiter$createPlayer(helper, "stack-unlimiter-test");
         player.getInventory().clearContent();
 
-        try {
-            helper.getLevel().getServer().getCommands().performPrefixedCommand(
-                    player.createCommandSourceStack().withPermission(4),
-                    "give @s minecraft:cobblestone 2000"
-            );
-        } catch (NullPointerException exception) {
-            // The Forge mock player has no Netty channel. GiveCommand reaches that
-            // harness limitation only after it has inserted the stack we assert below.
-            if (exception.getMessage() == null
-                    || (!exception.getMessage().contains("channel")
-                    && !exception.getMessage().contains("connection"))) {
-                throw exception;
-            }
-        }
+        stackUnlimiter$performCommand(helper, player, "give @s minecraft:cobblestone 2000");
 
         long total = 0;
         int occupiedSlots = 0;
@@ -110,6 +104,73 @@ public final class StackCountGameTests implements FabricGameTest {
         assertEquals(1, occupiedSlots, "occupied inventory slots");
         assertEquals(2_000, total, "given item total");
         helper.succeed();
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    public void giveCommandSynchronizesNonStackableItems(GameTestHelper helper) {
+        ServerPlayer player = stackUnlimiter$createPlayer(helper, "stack-unlimiter-non-stackable-give-test");
+        player.getInventory().clearContent();
+
+        stackUnlimiter$performCommand(helper, player, "give @s minecraft:diamond_pickaxe");
+        stackUnlimiter$performCommand(helper, player, "give @s minecraft:shulker_box");
+
+        assertEquals(1, stackUnlimiter$countInventoryItem(player, Items.DIAMOND_PICKAXE),
+                "server pickaxe count after give");
+        assertEquals(1, stackUnlimiter$countInventoryItem(player, Items.SHULKER_BOX),
+                "server shulker-box count after give");
+        assertEquals(0, StackCounts.get(ItemStack.EMPTY), "shared empty-stack count after give");
+
+        ClientboundContainerSetContentPacket decoded = stackUnlimiter$roundTripMenu(
+                player.inventoryMenu,
+                helper.getLevel().registryAccess()
+        );
+        long clientPickaxes = 0;
+        long clientShulkerBoxes = 0;
+        for (ItemStack stack : decoded.getItems()) {
+            if (stack.is(Items.DIAMOND_PICKAXE)) {
+                clientPickaxes += StackCounts.get(stack);
+            } else if (stack.is(Items.SHULKER_BOX)) {
+                clientShulkerBoxes += StackCounts.get(stack);
+            }
+        }
+        assertEquals(1, clientPickaxes, "client pickaxe count after give synchronization");
+        assertEquals(1, clientShulkerBoxes, "client shulker-box count after give synchronization");
+        helper.succeed();
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    public void shulkerTooltipUsesExactContainedCount(GameTestHelper helper) {
+        ItemStack planks = new ItemStack(Items.OAK_PLANKS, 64);
+        StackCounts.set(planks, 400_000L);
+
+        ItemStack shulker = new ItemStack(Items.SHULKER_BOX);
+        shulker.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(List.of(planks)));
+
+        ItemStack stored = shulker.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY)
+                .nonEmptyItems()
+                .iterator()
+                .next();
+        assertEquals(400_000L, StackCounts.get(stored), "exact count stored inside shulker");
+
+        List<Component> tooltip = new ArrayList<>();
+        shulker.getItem().appendHoverText(
+                shulker,
+                Item.TooltipContext.of(helper.getLevel()),
+                tooltip,
+                TooltipFlag.NORMAL
+        );
+
+        for (Component line : tooltip) {
+            if (line.getContents() instanceof TranslatableContents contents
+                    && contents.getKey().equals("container.shulkerBox.itemCount")) {
+                Object displayedCount = contents.getArgs()[1];
+                assertEquals(400_000L, ((Number) displayedCount).longValue(),
+                        "shulker tooltip contained count");
+                helper.succeed();
+                return;
+            }
+        }
+        throw new GameTestAssertException("shulker tooltip item-count line was not generated");
     }
 
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
@@ -581,6 +642,27 @@ public final class StackCountGameTests implements FabricGameTest {
             return ClientboundContainerSetContentPacket.STREAM_CODEC.decode(buffer);
         } finally {
             buffer.release();
+        }
+    }
+
+    private static void stackUnlimiter$performCommand(
+            GameTestHelper helper,
+            ServerPlayer player,
+            String command
+    ) {
+        try {
+            helper.getLevel().getServer().getCommands().performPrefixedCommand(
+                    player.createCommandSourceStack().withPermission(4),
+                    command
+            );
+        } catch (NullPointerException exception) {
+            // The mock player has no Netty channel. GiveCommand reaches that
+            // harness limitation only after it has inserted the stack asserted by the test.
+            if (exception.getMessage() == null
+                    || (!exception.getMessage().contains("channel")
+                    && !exception.getMessage().contains("connection"))) {
+                throw exception;
+            }
         }
     }
 
