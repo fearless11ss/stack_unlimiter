@@ -43,7 +43,7 @@ updated: 2026-11-10
 | `forge-1.20.1` | 1.20.1 | Forge | 17 | `0.1.11` | Inventory fixes | загружен на Modrinth и CurseForge |
 | `fabric-1.20.1` | 1.20.1 | Fabric | 17 | `0.1.12` | Initial Fabric release | загружен на Modrinth и CurseForge |
 | `forge-1.21` | 1.21 | Forge | 21 | `0.1.13` | Initial Forge 1.21 release | загружен на Modrinth и CurseForge |
-| `fabric-1.21` | 1.21 | Fabric | 21 | `0.1.14` | Initial Fabric 1.21 release | собран и протестирован, ещё не опубликован |
+| `fabric-1.21` | 1.21 | Fabric | 21 | `0.1.15` | Initial Fabric 1.21 release | собран и протестирован, ещё не опубликован |
 | `forge-26.3` | 26.3 | Forge | 25 | `0.1.16` | Initial Forge 26.3 release | загружен на Modrinth и CurseForge |
 | `fabric-26.3` | 26.3 | Fabric | 25+ для Gradle | `0.1.9` | Initial Fabric release | загружен на Modrinth и CurseForge |
 | `neoforge-26.3` | 26.3 | NeoForge | 25 | `0.1.9` | Initial NeoForge release | загружен на Modrinth и CurseForge |
@@ -226,6 +226,7 @@ cd forge-1.21
 - [ServerPlaceRecipeMixin](fabric-1.21/src/main/java/dev/asp1r/stackunlimiter/mixin/ServerPlaceRecipeMixin.java) сохраняет exact-count при переносе ингредиентов через recipe book.
 - [InventoryMenuMixin](fabric-1.21/src/main/java/dev/asp1r/stackunlimiter/mixin/InventoryMenuMixin.java) выполняет массовый Shift-крафт без цикла по сотням тысяч операций.
 - Fabric API `0.102.0+1.21` используется только для GameTest. Итоговый JAR не содержит его и не объявляет runtime-зависимость; игроку нужен только Fabric Loader.
+- `verifyRemappedMixinRefmap` проверяет релизный JAR и не позволяет собрать его без named-to-intermediary mappings для `ItemStackMixin`.
 
 ### Тесты и сборка
 
@@ -238,8 +239,8 @@ cd fabric-1.21
 
 - Unit: [LongCountMathTest](fabric-1.21/src/test/java/dev/asp1r/stackunlimiter/internal/LongCountMathTest.java), [StackCountDisplayTest](fabric-1.21/src/test/java/dev/asp1r/stackunlimiter/client/StackCountDisplayTest.java).
 - Integration: [StackCountGameTests](fabric-1.21/src/gametest/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java).
-- Подтверждённое состояние `0.1.14`: unit-тесты, `clean build` и все 22 обязательных теста `runGametest` проходят.
-- JAR: `fabric-1.21/build/libs/stack_unlimiter-fabric-1.21-0.1.14.jar`.
+- Подтверждённое состояние `0.1.15`: проверка remapped refmap, unit-тесты, `clean build` и все 22 обязательных теста `runGametest` проходят.
+- JAR: `fabric-1.21/build/libs/stack_unlimiter-fabric-1.21-0.1.15.jar`.
 - Metadata JAR: Minecraft строго `1.21`, Fabric Loader `>=0.20.1`, Java `>=21`; class-file version `65`.
 
 ### Публикация
@@ -353,6 +354,15 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 - Modrinth и CurseForge: `0.1.9` загружен как Release с display name `Stack Unlimiter 0.1.9 — NeoForge 26.3` и одинаковым changelog из [NeoForge 26.3 — 0.1.9](RELEASE_CHANGELOGS.md).
 
 ## Диагностические маршруты
+
+### Fabric запускается в dev, но падает в обычном лаунчере
+
+1. Найти первый `InvalidMixinException` в crash-report, а не последующие ошибки рендера.
+2. Проверить refmap внутри remapped JAR и наличие записи для упавшего mixin.
+3. Проверить `@Mixin(..., remap = false)`, `@Shadow` и имена целевых методов/полей.
+4. Выполнить `verifyRemappedMixinRefmap`; dev GameTest использует named mappings и сам по себе не обнаруживает отсутствие production remapping.
+
+Fabric 1.21 `0.1.14` падал при старте, потому что `ItemStackMixin` был исключён из remapping и поле `count` не преобразовывалось в intermediary-имя `field_8031`. Исправлено в `0.1.15`.
 
 ### Предмет подбирается, но цифра не меняется
 

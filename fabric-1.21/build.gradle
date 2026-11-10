@@ -1,3 +1,5 @@
+import groovy.json.JsonSlurper
+
 plugins {
     id 'java'
     id 'idea'
@@ -87,6 +89,36 @@ tasks.withType(JavaCompile).configureEach {
 
 tasks.named('test', Test).configure {
     useJUnitPlatform()
+}
+
+def verifyRemappedMixinRefmap = tasks.register('verifyRemappedMixinRefmap') {
+    dependsOn tasks.named('remapJar')
+
+    doLast {
+        def remappedJar = tasks.named('remapJar').get().archiveFile.get().asFile
+        def refmapFiles = zipTree(remappedJar).matching {
+            include '*-refmap.json'
+        }.files
+        if (refmapFiles.size() != 1) {
+            throw new GradleException("Expected one mixin refmap in ${remappedJar.name}, found ${refmapFiles.size()}")
+        }
+
+        def refmap = new JsonSlurper().parse(refmapFiles.first())
+        def intermediaryMappings = refmap.data?.get('named:intermediary') ?: refmap.mappings
+        def itemStackMixin = intermediaryMappings?.get(
+                'dev/asp1r/stackunlimiter/mixin/ItemStackMixin'
+        )
+        if (!itemStackMixin) {
+            throw new GradleException(
+                    'ItemStackMixin is absent from the named-to-intermediary refmap; '
+                            + 'the remapped release JAR will crash outside the development environment'
+            )
+        }
+    }
+}
+
+tasks.named('check').configure {
+    dependsOn verifyRemappedMixinRefmap
 }
 
 tasks.named('jar', Jar).configure {

@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(value = ItemStack.class, remap = false)
+@Mixin(ItemStack.class)
 public abstract class ItemStackMixin implements LongCountAccess {
     @Shadow
     private int count;
