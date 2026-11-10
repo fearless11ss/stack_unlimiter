@@ -26,6 +26,7 @@ Each supported Minecraft and loader pair is an independent Gradle module:
 - `fabric-1.20.1`
 - `forge-1.21`
 - `fabric-1.21`
+- `neoforge-1.21`
 - `forge-26.3`
 - `fabric-26.3`
 - `neoforge-26.3`
@@ -63,6 +64,9 @@ Useful commands for Fabric modules:
 ./gradlew runGametest    # Fabric 1.20.1 and 1.21
 ./gradlew runGameTest    # Fabric 26.3
 ```
+
+NeoForge modules use the same `clean build`, `runClient`, `runServer`, and
+`runGameTestServer` commands as Forge modules.
 
 On Windows, use `gradlew.bat` instead of `./gradlew`.
 

@@ -30,6 +30,7 @@ updated: 2026-11-10
 - [Fabric 1.20.1 — версии и метаданные](fabric-1.20.1/gradle.properties)
 - [Forge 1.21 — версии и метаданные](forge-1.21/gradle.properties)
 - [Fabric 1.21 — версии и метаданные](fabric-1.21/gradle.properties)
+- [NeoForge 1.21 — версии и метаданные](neoforge-1.21/gradle.properties)
 - [Forge 26.3 — версии и метаданные](forge-26.3/gradle.properties)
 - [Fabric 26.3 — версии и метаданные](fabric-26.3/gradle.properties)
 - [NeoForge 26.3 — версии и метаданные](neoforge-26.3/gradle.properties)
@@ -44,6 +45,7 @@ updated: 2026-11-10
 | `fabric-1.20.1` | 1.20.1 | Fabric | 17 | `0.1.12` | Initial Fabric release | загружен на Modrinth и CurseForge |
 | `forge-1.21` | 1.21 | Forge | 21 | `0.1.13` | Initial Forge 1.21 release | загружен на Modrinth и CurseForge |
 | `fabric-1.21` | 1.21 | Fabric | 21 | `0.1.15` | Initial Fabric 1.21 release | загружен на Modrinth и CurseForge |
+| `neoforge-1.21` | 1.21 | NeoForge | 21 | `0.1.16` | Initial NeoForge 1.21 release | собран, 23 GameTest проходят; публикация не начата |
 | `forge-26.3` | 26.3 | Forge | 25 | `0.1.16` | Initial Forge 26.3 release | загружен на Modrinth и CurseForge |
 | `fabric-26.3` | 26.3 | Fabric | 25+ для Gradle | `0.1.9` | Initial Fabric release | загружен на Modrinth и CurseForge |
 | `neoforge-26.3` | 26.3 | NeoForge | 25 | `0.1.9` | Initial NeoForge release | загружен на Modrinth и CurseForge |
@@ -88,6 +90,7 @@ flowchart LR
 | Fabric 1.20.1 | `@Unique long` в `ItemStackMixin` | `LongCountNbt` | `FriendlyByteBufMixin` добавляет временный exact-count в NBT пакета |
 | Forge 1.21 | `DataComponents.CUSTOM_DATA` | внутренний ключ в custom data | сериализация компонентов Minecraft |
 | Fabric 1.21 | `DataComponents.CUSTOM_DATA` | внутренний ключ в custom data | сериализация компонентов Minecraft |
+| NeoForge 1.21 | `DataComponents.CUSTOM_DATA` | внутренний ключ в custom data | сериализация компонентов Minecraft |
 | Forge 26.3 | `DataComponents.CUSTOM_DATA` | внутренний ключ в custom data | сериализация компонентов Minecraft |
 | Fabric 26.3 | `DataComponents.CUSTOM_DATA` | внутренний ключ в custom data | сериализация компонентов Minecraft |
 | NeoForge 26.3 | `DataComponents.CUSTOM_DATA` | внутренний ключ в custom data | сериализация компонентов Minecraft |
@@ -103,7 +106,7 @@ flowchart LR
 | `/give` | `mixin/GiveCommandMixin` | один exact-стак вместо множества по 64 |
 | Крафт в инвентаре | `mixin/InventoryMenuMixin` | ингредиенты, результат, возврат остатков, bulk Shift-click |
 | Recipe book | `mixin/StackedContentsMixin`, `mixin/ServerPlaceRecipeMixin`, `mixin/AbstractCraftingMenuAccessor` | расчёт количества рецептов и распределение всех ингредиентов |
-| Loader-specific storage API | Forge: `mixin/ItemStackHandlerMixin`; NeoForge 26.3: legacy API отсутствует | insert/extract/simulate без потерь там, где loader предоставляет отдельный handler API |
+| Loader-specific storage API | Forge и NeoForge 1.21: `mixin/ItemStackHandlerMixin`; NeoForge 26.3: legacy API отсутствует | insert/extract/simulate без потерь там, где loader предоставляет отдельный handler API |
 | Синхронизация меню | `ItemStack.matches`, сравнение remote slot, packet serialization | сервер изменился → клиент обязательно получил новый exact-count |
 | Отрисовка | `client/StackCountDisplay`, `mixin/GuiGraphicsMixin`, иногда `AbstractContainerScreenMixin` | `65`, `999`, `1K`, крупные значения и ширина подписи |
 | Интеграционные тесты | `gametest/StackCountGameTests` | полный игровой маршрут, не только изолированный метод |
@@ -246,6 +249,44 @@ cd fabric-1.21
 ### Публикация
 
 - Modrinth и CurseForge: `0.1.15` загружен как Release с display name `Stack Unlimiter 0.1.15 — Fabric 1.21`, Minecraft `1.21`, loader `Fabric`, окружением Client + Server и changelog из [каталога релизов](RELEASE_CHANGELOGS.md).
+
+## NeoForge 1.21
+
+### Точки входа
+
+- [StackUnlimiter](neoforge-1.21/src/main/java/dev/asp1r/stackunlimiter/StackUnlimiter.java) — NeoForge entry point; `RegisterGameTestsEvent` регистрирует интеграционные тесты через mod event bus.
+- [neoforge.mods.toml](neoforge-1.21/src/main/templates/META-INF/neoforge.mods.toml) — генерируемые metadata с точным диапазоном Minecraft `1.21`, NeoForge `>=21.0.167` и обязательной установкой с обеих сторон.
+- [Mixin config](neoforge-1.21/src/main/resources/stack_unlimiter.mixins.json) — серверные и клиентские интеграции ветки; минимальная версия Mixin `0.8.6` соответствует NeoForge 21.0.
+
+### Особенности ветки
+
+- Exact-count хранится в `DataComponents.CUSTOM_DATA`; сохранение и сеть используют стандартную сериализацию компонентов Minecraft.
+- [AbstractContainerMenuInteractionMixin](neoforge-1.21/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerMenuInteractionMixin.java) покрывает ЛКМ, ПКМ, Shift-click, number key, double-click, drag и выброс exact-стаков.
+- [InventoryMixin](neoforge-1.21/src/main/java/dev/asp1r/stackunlimiter/mixin/InventoryMixin.java) объединяет подбор и вставку с существующим oversized-стаком.
+- [ServerPlaceRecipeMixin](neoforge-1.21/src/main/java/dev/asp1r/stackunlimiter/mixin/ServerPlaceRecipeMixin.java) сохраняет exact-count при переносе ингредиентов через recipe book.
+- [InventoryMenuMixin](neoforge-1.21/src/main/java/dev/asp1r/stackunlimiter/mixin/InventoryMenuMixin.java) использует `CommonHooks` и `EventHooks` для совместимого массового Shift-крафта.
+- NeoForge-совместимость с handler-инвентарями находится в [ItemStackHandlerMixin](neoforge-1.21/src/main/java/dev/asp1r/stackunlimiter/mixin/ItemStackHandlerMixin.java).
+- Все mixin используют Mojang-имена NeoForge напрямую (`remap = false`); refmap этой ветке не нужен.
+
+### Тесты и сборка
+
+```powershell
+cd neoforge-1.21
+.\gradlew.bat test
+.\gradlew.bat runGameTestServer
+.\gradlew.bat clean build
+```
+
+- Unit: [LongCountMathTest](neoforge-1.21/src/test/java/dev/asp1r/stackunlimiter/internal/LongCountMathTest.java), [StackCountDisplayTest](neoforge-1.21/src/test/java/dev/asp1r/stackunlimiter/client/StackCountDisplayTest.java).
+- Integration: [StackCountGameTests](neoforge-1.21/src/main/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java).
+- Подтверждённое состояние `0.1.16`: unit-тесты, `build` и все 23 обязательных теста `runGameTestServer` проходят.
+- JAR: `neoforge-1.21/build/libs/stack_unlimiter-neoforge-1.21-0.1.16.jar`.
+- Metadata JAR: Minecraft строго `1.21`, NeoForge `>=21.0.167`, Java 21; class-file version `65`.
+- SHA-256: `387243EBC07C195AE82C17F5DDC2655FEA35D5ED936B55579A6824B609AD535C`.
+
+### Публикация
+
+- Текст для Modrinth и CurseForge подготовлен в [каталоге релизов](RELEASE_CHANGELOGS.md); файл ещё не загружен.
 
 ## Forge 26.3
 
