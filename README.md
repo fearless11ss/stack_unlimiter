@@ -14,7 +14,7 @@ depend on the mod and should be backed up before installation or updates.
 | --- | --- | --- | --- | --- |
 | [`forge-1.20.1`](forge-1.20.1/) | 1.20.1 | Forge | 0.1.11 | 17 |
 | [`fabric-1.20.1`](fabric-1.20.1/) | 1.20.1 | Fabric | 0.1.12 | 17 |
-| [`forge-1.21`](forge-1.21/) | 1.21 | Forge | 0.1.13 | 21 |
+| [`forge-1.21`](forge-1.21/) | 1.21 | Forge | 0.1.14 | 21 |
 | [`fabric-1.21`](fabric-1.21/) | 1.21 | Fabric | 0.1.15 | 21 |
 | [`neoforge-1.21`](neoforge-1.21/) | 1.21 | NeoForge | 0.1.17 | 21 |
 | [`forge-26.3`](forge-26.3/) | 26.3 | Forge | 0.1.16 | 25 |

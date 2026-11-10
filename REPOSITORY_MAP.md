@@ -43,7 +43,7 @@ updated: 2026-11-10
 | --- | --- | --- | --- | --- | --- | --- |
 | `forge-1.20.1` | 1.20.1 | Forge | 17 | `0.1.11` | Inventory fixes | загружен на Modrinth и CurseForge |
 | `fabric-1.20.1` | 1.20.1 | Fabric | 17 | `0.1.12` | Initial Fabric release | загружен на Modrinth и CurseForge |
-| `forge-1.21` | 1.21 | Forge | 21 | `0.1.13` | Initial Forge 1.21 release | загружен на Modrinth и CurseForge |
+| `forge-1.21` | 1.21 | Forge | 21 | `0.1.14` | Non-stackable `/give` fix | собран; `0.1.13` загружен на Modrinth и CurseForge |
 | `fabric-1.21` | 1.21 | Fabric | 21 | `0.1.15` | Initial Fabric 1.21 release | загружен на Modrinth и CurseForge |
 | `neoforge-1.21` | 1.21 | NeoForge | 21 | `0.1.17` | Initial NeoForge 1.21 release | загружен на Modrinth и CurseForge |
 | `forge-26.3` | 26.3 | Forge | 25 | `0.1.16` | Initial Forge 26.3 release | загружен на Modrinth и CurseForge |
@@ -189,6 +189,7 @@ cd fabric-1.20.1
 - Exact-count хранится в `DataComponents.CUSTOM_DATA`; отдельный сетевой mixin не нужен, потому что компоненты `ItemStack` сериализуются Minecraft.
 - [AbstractContainerMenuInteractionMixin](forge-1.21/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerMenuInteractionMixin.java) покрывает ЛКМ, ПКМ, Shift-click, number key, double-click, drag и выброс exact-стаков.
 - [InventoryMixin](forge-1.21/src/main/java/dev/asp1r/stackunlimiter/mixin/InventoryMixin.java) объединяет подбор и вставку с существующим oversized-стаком.
+- [StackCounts.copyWithCount](forge-1.21/src/main/java/dev/asp1r/stackunlimiter/api/StackCounts.java) сохраняет тип предмета у нулевой копии, чтобы ванильный `Inventory.add` корректно выдавал принципиально нестакаемые инструменты и шалкеровые ящики.
 - [ServerPlaceRecipeMixin](forge-1.21/src/main/java/dev/asp1r/stackunlimiter/mixin/ServerPlaceRecipeMixin.java) не позволяет recipe book подменять exact-count фасадным значением `64` при переносе ингредиентов.
 - [InventoryMenuMixin](forge-1.21/src/main/java/dev/asp1r/stackunlimiter/mixin/InventoryMenuMixin.java) выполняет массовый Shift-крафт без цикла по сотням тысяч операций.
 - Forge-совместимость с `ItemStackHandler` находится в [ItemStackHandlerMixin](forge-1.21/src/main/java/dev/asp1r/stackunlimiter/mixin/ItemStackHandlerMixin.java).
@@ -205,13 +206,16 @@ cd forge-1.21
 
 - Unit: [LongCountMathTest](forge-1.21/src/test/java/dev/asp1r/stackunlimiter/internal/LongCountMathTest.java), [StackCountDisplayTest](forge-1.21/src/test/java/dev/asp1r/stackunlimiter/client/StackCountDisplayTest.java).
 - Integration: [StackCountGameTests](forge-1.21/src/main/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java).
-- Подтверждённое состояние `0.1.13`: unit-тесты, `clean build` и все 23 обязательных теста `runGameTestServer` проходят.
-- JAR: `forge-1.21/build/libs/stack_unlimiter-forge-1.21-0.1.13.jar`.
+- Регрессионный тест проверяет `/give` для алмазной кирки и шалкерового ящика на сервере и после сетевой сериализации инвентаря.
+- Подтверждённое состояние `0.1.14`: unit-тесты, `clean build` и все 24 обязательных теста `runGameTestServer` проходят.
+- JAR: `forge-1.21/build/libs/stack_unlimiter-forge-1.21-0.1.14.jar`.
+- SHA-256: `7956A66C8E1C07DE8BC3F117C7941A1B5CD74EE675D9C9E5998907A89309811C`.
 - Metadata JAR: Minecraft строго `1.21`, Forge `>=51`, Java `>=21`; class-file version `65`.
 
 ### Публикация
 
 - Modrinth и CurseForge: `0.1.13` загружен как Release с display name `Stack Unlimiter 0.1.13 — Forge 1.21`, Minecraft `1.21`, loader `Forge`, окружением Client + Server и changelog из [каталога релизов](RELEASE_CHANGELOGS.md).
+- Исправление `0.1.14` собрано и проверено, но ещё не загружено на площадки.
 
 ## Fabric 1.21
 
@@ -405,7 +409,7 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 3. Нельзя возвращать глобальный `ItemStack.EMPTY`, иначе последующий `grow` изменит singleton пустого стака и предмет потеряется.
 4. Регрессионный тест должен проверять инструмент и шалкеровый ящик как на сервере, так и после сетевой сериализации меню.
 
-В NeoForge 1.21 ошибка исправлена в `0.1.17`. При переносе исправления в другие ветки с компонентной моделью `ItemStack` нужен отдельный полный прогон их GameTest.
+В NeoForge 1.21 ошибка исправлена в `0.1.17`, а в Forge 1.21 — в `0.1.14`. Для каждой другой ветки нужен отдельный полный прогон её GameTest перед переносом исправления.
 
 ### Fabric запускается в dev, но падает в обычном лаунчере
 

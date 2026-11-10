@@ -91,20 +91,7 @@ public final class StackCountGameTests {
         ServerPlayer player = stackUnlimiter$createPlayer(helper, "stack-unlimiter-test");
         player.getInventory().clearContent();
 
-        try {
-            helper.getLevel().getServer().getCommands().performPrefixedCommand(
-                    player.createCommandSourceStack().withPermission(4),
-                    "give @s minecraft:cobblestone 2000"
-            );
-        } catch (NullPointerException exception) {
-            // The Forge mock player has no Netty channel. GiveCommand reaches that
-            // harness limitation only after it has inserted the stack we assert below.
-            if (exception.getMessage() == null
-                    || (!exception.getMessage().contains("channel")
-                    && !exception.getMessage().contains("connection"))) {
-                throw exception;
-            }
-        }
+        stackUnlimiter$performCommand(helper, player, "give @s minecraft:cobblestone 2000");
 
         long total = 0;
         int occupiedSlots = 0;
@@ -116,6 +103,37 @@ public final class StackCountGameTests {
         }
         assertEquals(1, occupiedSlots, "occupied inventory slots");
         assertEquals(2_000, total, "given item total");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void giveCommandSynchronizesNonStackableItems(GameTestHelper helper) {
+        ServerPlayer player = stackUnlimiter$createPlayer(helper, "stack-unlimiter-non-stackable-give-test");
+        player.getInventory().clearContent();
+
+        stackUnlimiter$performCommand(helper, player, "give @s minecraft:diamond_pickaxe");
+        stackUnlimiter$performCommand(helper, player, "give @s minecraft:shulker_box");
+
+        assertEquals(1, stackUnlimiter$countInventoryItem(player, Items.DIAMOND_PICKAXE),
+                "server pickaxe count after give");
+        assertEquals(1, stackUnlimiter$countInventoryItem(player, Items.SHULKER_BOX),
+                "server shulker-box count after give");
+
+        ClientboundContainerSetContentPacket decoded = stackUnlimiter$roundTripMenu(
+                player.inventoryMenu,
+                helper.getLevel().registryAccess()
+        );
+        long clientPickaxes = 0;
+        long clientShulkerBoxes = 0;
+        for (ItemStack stack : decoded.getItems()) {
+            if (stack.is(Items.DIAMOND_PICKAXE)) {
+                clientPickaxes += StackCounts.get(stack);
+            } else if (stack.is(Items.SHULKER_BOX)) {
+                clientShulkerBoxes += StackCounts.get(stack);
+            }
+        }
+        assertEquals(1, clientPickaxes, "client pickaxe count after give synchronization");
+        assertEquals(1, clientShulkerBoxes, "client shulker-box count after give synchronization");
         helper.succeed();
     }
 
@@ -621,6 +639,27 @@ public final class StackCountGameTests {
             return ClientboundContainerSetContentPacket.STREAM_CODEC.decode(buffer);
         } finally {
             buffer.release();
+        }
+    }
+
+    private static void stackUnlimiter$performCommand(
+            GameTestHelper helper,
+            ServerPlayer player,
+            String command
+    ) {
+        try {
+            helper.getLevel().getServer().getCommands().performPrefixedCommand(
+                    player.createCommandSourceStack().withPermission(4),
+                    command
+            );
+        } catch (NullPointerException exception) {
+            // The mock player has no Netty channel. GiveCommand reaches that
+            // harness limitation only after it has inserted the stack asserted by the test.
+            if (exception.getMessage() == null
+                    || (!exception.getMessage().contains("channel")
+                    && !exception.getMessage().contains("connection"))) {
+                throw exception;
+            }
         }
     }
 
