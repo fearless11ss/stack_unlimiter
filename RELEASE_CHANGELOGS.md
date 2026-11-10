@@ -27,13 +27,13 @@ updated: 2026-11-10
 | 1.20.1 | Forge | `0.1.11` | 17 | Modrinth, CurseForge | загружен | Inventory fixes |
 | 1.20.1 | Fabric | `0.1.12` | 17 | Modrinth, CurseForge | загружен | Initial Fabric release |
 | 1.21 | Forge | `0.1.13` | 21 | Modrinth, CurseForge | загружен | Initial Forge 1.21 release |
-| 1.21 | Fabric | `0.1.15` | 21 | Modrinth, CurseForge | текст подготовлен, файл не загружен | Initial Fabric 1.21 release |
+| 1.21 | Fabric | `0.1.15` | 21 | Modrinth, CurseForge | загружен | Initial Fabric 1.21 release |
 | 26.3 | Forge | `0.1.16` | 25 | Modrinth, CurseForge | загружен | Initial Forge 26.3 release |
 | 26.3 | Fabric | `0.1.9` | 25 | Modrinth, CurseForge | загружен | Initial Fabric release |
 | 26.3 | NeoForge | `0.1.9` | 25 | Modrinth, CurseForge | загружен | Initial NeoForge release |
 
 > [!success] Ранее опубликованные сборки загружены
-> Forge 1.20.1 `0.1.11`, Fabric 1.20.1 `0.1.12`, Forge 1.21 `0.1.13`, Forge 26.3 `0.1.16`, Fabric 26.3 `0.1.9` и NeoForge 26.3 `0.1.9` загружены на Modrinth и CurseForge.
+> Forge 1.20.1 `0.1.11`, Fabric 1.20.1 `0.1.12`, Forge 1.21 `0.1.13`, Fabric 1.21 `0.1.15`, Forge 26.3 `0.1.16`, Fabric 26.3 `0.1.9` и NeoForge 26.3 `0.1.9` загружены на Modrinth и CurseForge.
 
 ## Общие поля публикации
 
@@ -168,8 +168,8 @@ Stack Unlimiter is now available for Forge on Minecraft 26.3.
 
 ## Fabric 1.21 — 0.1.15
 
-> [!info] Текст подготовлен для Modrinth и CurseForge
-> Рекомендуемый display name: `Stack Unlimiter 0.1.15 — Fabric 1.21`. Файл ещё не опубликован.
+> [!success] Загрузка на Modrinth и CurseForge подтверждена
+> Файл загружен на обе площадки как Release с display name `Stack Unlimiter 0.1.15 — Fabric 1.21`, Minecraft `1.21`, loader `Fabric`, окружением Client + Server и без обязательной зависимости от Fabric API.
 
 ```markdown
 # Initial Fabric release for Minecraft 1.21
