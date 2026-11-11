@@ -48,7 +48,7 @@ updated: 2026-11-11
 | `neoforge-1.21` | 1.21 | NeoForge | 21 | `0.1.18` | Shulker tooltip count fix | загружен на Modrinth и CurseForge |
 | `forge-26.3` | 26.3 | Forge | 25 | `0.1.17` | Inventory and container tooltip fixes | загружен на Modrinth и CurseForge |
 | `fabric-26.3` | 26.3 | Fabric | 25+ для Gradle | `0.1.10` | Inventory and container tooltip fixes | загружен на Modrinth и CurseForge |
-| `neoforge-26.3` | 26.3 | NeoForge | 25 | `0.1.10` | Inventory and container tooltip fixes | собран; `0.1.9` загружен на Modrinth и CurseForge |
+| `neoforge-26.3` | 26.3 | NeoForge | 25 | `0.1.10` | Inventory and container tooltip fixes | загружен на Modrinth и CurseForge |
 
 > [!warning] Независимые реализации
 > Исправление в одном модуле не переносится автоматически в остальные. Перед портированием сравни `stack_unlimiter.mixins.json`, Minecraft API и набор GameTest конкретной пары.
@@ -440,7 +440,7 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 ### Публикация
 
 - Modrinth и CurseForge: `0.1.9` загружен как Release с display name `Stack Unlimiter 0.1.9 — NeoForge 26.3` и одинаковым changelog из [NeoForge 26.3 — 0.1.9](RELEASE_CHANGELOGS.md).
-- Исправление `0.1.10` собрано и проверено, но ещё не загружено на площадки; changelog подготовлен в [каталоге релизов](RELEASE_CHANGELOGS.md).
+- Modrinth и CurseForge: `0.1.10` загружен как Release с display name `Stack Unlimiter 0.1.10 — NeoForge 26.3`, Minecraft `26.3`, loader `NeoForge`, Java 25, окружением Client + Server, без дополнительных зависимостей и с changelog из [каталога релизов](RELEASE_CHANGELOGS.md).
 
 ## Диагностические маршруты
 
