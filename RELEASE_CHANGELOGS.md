@@ -38,6 +38,7 @@ updated: 2026-11-11
 | 26.3 | Fabric | `0.1.9` | 25 | Modrinth, CurseForge | загружен | Initial Fabric release |
 | 26.3 | Fabric | `0.1.10` | 25 | Modrinth, CurseForge | загружен | Inventory and container tooltip fixes |
 | 26.3 | NeoForge | `0.1.9` | 25 | Modrinth, CurseForge | загружен | Initial NeoForge release |
+| 26.3 | NeoForge | `0.1.10` | 25 | Modrinth, CurseForge | текст подготовлен | Inventory and container tooltip fixes |
 
 > [!success] Ранее опубликованные сборки загружены
 > Forge 1.20.1 `0.1.11`, Fabric 1.20.1 `0.1.12`, Forge 1.21 `0.1.15`, Fabric 1.21 `0.1.16`, NeoForge 1.21 `0.1.18`, Forge 26.3 `0.1.17`, Fabric 26.3 `0.1.10` и NeoForge 26.3 `0.1.9` загружены на Modrinth и CurseForge.
@@ -462,6 +463,30 @@ Stack Unlimiter is now available for NeoForge.
 - Supports crafting, bulk Shift-click crafting, and recipe-book placement
 - Displays large stack counts using compact labels
 - Preserves oversized stacks during saving and synchronization
+
+## Important
+
+- The mod must be installed on both the client and server
+- Worlds containing oversized stacks depend on this mod
+- Back up your worlds before installing or updating
+- Compatibility with every mod is not guaranteed
+```
+
+## NeoForge 26.3 — 0.1.10
+
+> [!info] Текст подготовлен для публикации
+> Используй display name `Stack Unlimiter 0.1.10 — NeoForge 26.3`, Minecraft `26.3`, loader `NeoForge`, Java 25, окружение Client + Server, тип Release и без дополнительных зависимостей.
+
+```markdown
+# Inventory and container tooltip fixes
+
+## Fixed
+
+- Fixed `/give` silently losing intentionally non-stackable items such as tools and shulker boxes
+- Fixed container and shulker-box tooltips displaying `64` instead of the exact contained stack count
+- Preserved item types in zero-count copies used by vanilla inventory insertion
+- Prevented inventory insertion from mutating Minecraft's shared empty-stack singleton
+- Preserved signed 64-bit counts when displaying container contents
 
 ## Important
 

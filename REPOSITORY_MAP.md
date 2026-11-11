@@ -48,7 +48,7 @@ updated: 2026-11-11
 | `neoforge-1.21` | 1.21 | NeoForge | 21 | `0.1.18` | Shulker tooltip count fix | загружен на Modrinth и CurseForge |
 | `forge-26.3` | 26.3 | Forge | 25 | `0.1.17` | Inventory and container tooltip fixes | загружен на Modrinth и CurseForge |
 | `fabric-26.3` | 26.3 | Fabric | 25+ для Gradle | `0.1.10` | Inventory and container tooltip fixes | загружен на Modrinth и CurseForge |
-| `neoforge-26.3` | 26.3 | NeoForge | 25 | `0.1.9` | Initial NeoForge release | загружен на Modrinth и CurseForge |
+| `neoforge-26.3` | 26.3 | NeoForge | 25 | `0.1.10` | Inventory and container tooltip fixes | собран; `0.1.9` загружен на Modrinth и CurseForge |
 
 > [!warning] Независимые реализации
 > Исправление в одном модуле не переносится автоматически в остальные. Перед портированием сравни `stack_unlimiter.mixins.json`, Minecraft API и набор GameTest конкретной пары.
@@ -405,12 +405,14 @@ cd fabric-26.3
 ### Особенности ветки
 
 - Exact-count хранится в `DataComponents.CUSTOM_DATA`; модель и полный набор vanilla-инвентарных операций перенесены из исправленной реализации 26.3.
+- [StackCounts.copyWithCount](neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/api/StackCounts.java) сохраняет тип предмета у нулевой копии, чтобы ванильный `Inventory.add` не терял принципиально нестакаемые инструменты и шалкеровые ящики при `/give` и не изменял общий `ItemStack.EMPTY`.
+- [ItemContainerContentsMixin](neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/ItemContainerContentsMixin.java) сохраняет ванильную структуру tooltip контейнера, но передаёт exact-count типа `long` вместо фасадного значения `64`.
 - [AbstractContainerMenuInteractionMixin](neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerMenuInteractionMixin.java) обрабатывает ЛКМ, ПКМ, Shift-click, number key, double-click, drag и выброс без обрезания до `64`.
 - [AbstractContainerScreenMixin](neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerScreenMixin.java) использует exact-count в клиентском предпросмотре drag-распределения.
 - [BulkCraftingDispatch](neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/internal/BulkCraftingDispatch.java) координирует серверный массовый крафт.
 - [InventoryMenuMixin](neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/InventoryMenuMixin.java) устанавливает crafting player через `CommonHooks` и отправляет NeoForge crafting event через `EventHooks`, сохраняя совместимость bulk crafting с событиями loader.
 - В NeoForge 26.3 нет legacy Forge `ItemStackHandler`/`IItemHandler`, поэтому Forge-специфичный `ItemStackHandlerMixin` не переносится. Vanilla-инвентари и меню покрыты полностью.
-- [GameTestRegistry](neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/gametest/GameTestRegistry.java) регистрирует 33 функции через `DeferredRegister` в `BuiltInRegistries.TEST_FUNCTION`.
+- [GameTestRegistry](neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/gametest/GameTestRegistry.java) регистрирует 35 функций через `DeferredRegister` в `BuiltInRegistries.TEST_FUNCTION`.
 - Data-driven описания находятся в `src/main/resources/data/stack_unlimiter/test_instance/`, а общая пустая структура — в [empty.nbt](neoforge-26.3/src/main/resources/data/stack_unlimiter/structure/empty.nbt).
 
 ### Тесты и сборка
@@ -428,12 +430,17 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 
 - Unit: `src/test/java/dev/asp1r/stackunlimiter/`.
 - Integration: [StackCountGameTests](neoforge-26.3/src/main/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java).
-- Подтверждённое состояние `0.1.9`: `test`, `clean build` и все 34 теста, обнаруженные `runGameTestServer`, проходят.
-- Результат: `neoforge-26.3/build/libs/`.
+- Регрессионный тест проверяет `/give` для алмазной кирки и шалкерового ящика и подтверждает, что глобальный `ItemStack.EMPTY` не изменяется.
+- Регрессионный тест контейнерного tooltip подтверждает, что exact-count `400000` сохраняется внутри шалкера и отображается без подмены на `64`.
+- Подтверждённое состояние `0.1.10`: unit-тесты, `clean build` и все 36 тестов, обнаруженные `runGameTestServer`, проходят.
+- JAR: `neoforge-26.3/build/libs/stack_unlimiter-neoforge-26.3-0.1.10.jar`.
+- SHA-256: `DE6BBE5B461E98F6DB7C3F556D5A3789DDA6CD90E3200C376FB29DF0DEFA2177`.
+- Metadata JAR: Minecraft строго `26.3`, NeoForge `>=26.3.0.99`, Java 25; class-file version `69`.
 
 ### Публикация
 
 - Modrinth и CurseForge: `0.1.9` загружен как Release с display name `Stack Unlimiter 0.1.9 — NeoForge 26.3` и одинаковым changelog из [NeoForge 26.3 — 0.1.9](RELEASE_CHANGELOGS.md).
+- Исправление `0.1.10` собрано и проверено, но ещё не загружено на площадки; changelog подготовлен в [каталоге релизов](RELEASE_CHANGELOGS.md).
 
 ## Диагностические маршруты
 
@@ -444,7 +451,7 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 3. Нельзя возвращать глобальный `ItemStack.EMPTY`, иначе последующий `grow` изменит singleton пустого стака и предмет потеряется.
 4. Регрессионный тест должен проверять инструмент и шалкеровый ящик как на сервере, так и после сетевой сериализации меню.
 
-В NeoForge 1.21 ошибка исправлена в `0.1.17`, в Forge 1.21 — в `0.1.14`, в Fabric 1.21 — в `0.1.16`, в Fabric 26.3 — в `0.1.10`, а в Forge 26.3 — в `0.1.17`. Для каждой другой ветки нужен отдельный полный прогон её GameTest перед переносом исправления.
+В NeoForge 1.21 ошибка исправлена в `0.1.17`, в Forge 1.21 — в `0.1.14`, в Fabric 1.21 — в `0.1.16`, в Fabric 26.3 — в `0.1.10`, в Forge 26.3 — в `0.1.17`, а в NeoForge 26.3 — в `0.1.10`. Для каждой другой ветки нужен отдельный полный прогон её GameTest перед переносом исправления.
 
 ### Tooltip шалкерового ящика показывает `64` вместо exact-count
 
@@ -454,7 +461,7 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 4. Исправлять нужно только числовой аргумент строки количества, не меняя глобальную семантику `getCount()` и остальные строки tooltip.
 5. Регрессионный тест должен отдельно проверять сохранённое значение и сформированный аргумент перевода.
 
-В Forge 1.21 отображение исправлено в `0.1.15`, в NeoForge 1.21 — в `0.1.18`, в Fabric 1.21 — в `0.1.16`, в Fabric 26.3 — в `0.1.10`, а в Forge 26.3 — в `0.1.17`.
+В Forge 1.21 отображение исправлено в `0.1.15`, в NeoForge 1.21 — в `0.1.18`, в Fabric 1.21 — в `0.1.16`, в Fabric 26.3 — в `0.1.10`, в Forge 26.3 — в `0.1.17`, а в NeoForge 26.3 — в `0.1.10`.
 
 ### Fabric запускается в dev, но падает в обычном лаунчере
 

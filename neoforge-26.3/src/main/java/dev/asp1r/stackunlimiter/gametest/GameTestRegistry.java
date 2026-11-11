@@ -19,6 +19,8 @@ public final class GameTestRegistry {
         TEST_FUNCTIONS.register("intentionally_non_stackable_items_remain_non_stackable", () -> StackCountGameTests::intentionallyNonStackableItemsRemainNonStackable);
         TEST_FUNCTIONS.register("inventory_merges_oversized_stacks", () -> StackCountGameTests::inventoryMergesOversizedStacks);
         TEST_FUNCTIONS.register("give_command_uses_one_eligible_stack", () -> StackCountGameTests::giveCommandUsesOneEligibleStack);
+        TEST_FUNCTIONS.register("give_command_preserves_non_stackable_items", () -> StackCountGameTests::giveCommandPreservesNonStackableItems);
+        TEST_FUNCTIONS.register("container_tooltip_uses_exact_contained_count", () -> StackCountGameTests::containerTooltipUsesExactContainedCount);
         TEST_FUNCTIONS.register("drop_selected_item_removes_entire_oversized_stack", () -> StackCountGameTests::dropSelectedItemRemovesEntireOversizedStack);
         TEST_FUNCTIONS.register("inventory_throw_drops_one_exact_stack", () -> StackCountGameTests::inventoryThrowDropsOneExactStack);
         TEST_FUNCTIONS.register("inventory_shift_click_preserves_oversized_stack", () -> StackCountGameTests::inventoryShiftClickPreservesOversizedStack);
