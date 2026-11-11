@@ -41,7 +41,7 @@ updated: 2026-11-11
 
 | Модуль | Minecraft | Loader | Java | Версия | Changelog | Статус |
 | --- | --- | --- | --- | --- | --- | --- |
-| `forge-1.20.1` | 1.20.1 | Forge | 17 | `0.1.12` | Shulker tooltip fix | готовится к публикации |
+| `forge-1.20.1` | 1.20.1 | Forge | 17 | `0.1.12` | Shulker tooltip fix | загружен на Modrinth и CurseForge |
 | `fabric-1.20.1` | 1.20.1 | Fabric | 17 | `0.1.12` | Initial Fabric release | загружен на Modrinth и CurseForge |
 | `forge-1.21` | 1.21 | Forge | 21 | `0.1.15` | Inventory and shulker tooltip fixes | загружен на Modrinth и CurseForge |
 | `fabric-1.21` | 1.21 | Fabric | 21 | `0.1.16` | Inventory and shulker tooltip fixes | загружен на Modrinth и CurseForge |
@@ -143,6 +143,10 @@ cd forge-1.20.1
 - Integration: [StackCountGameTests](forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java), [GiveCommandRegressionGameTests](forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/gametest/GiveCommandRegressionGameTests.java), [ShulkerTooltipRegressionGameTests](forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/gametest/ShulkerTooltipRegressionGameTests.java); 25 обязательных GameTest входят в зафиксированный исходный код и проходят.
 - JAR: `forge-1.20.1/build/libs/stack_unlimiter-0.1.12.jar`.
 - SHA-256: `601BBE8CEA13E22809ED6D0239EE5A9D2F0CA211AC36986EAAD47CA6E669FDE8`.
+
+### Публикация
+
+- Modrinth и CurseForge: `0.1.12` загружен как Release с display name `Stack Unlimiter 0.1.12 — Forge 1.20.1`, Minecraft `1.20.1`, loader `Forge`, Java 17, окружением Client + Server, без дополнительных зависимостей и с changelog из [каталога релизов](RELEASE_CHANGELOGS.md).
 
 ## Fabric 1.20.1
 
