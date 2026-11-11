@@ -41,7 +41,7 @@ updated: 2026-11-11
 
 | Модуль | Minecraft | Loader | Java | Версия | Changelog | Статус |
 | --- | --- | --- | --- | --- | --- | --- |
-| `forge-1.20.1` | 1.20.1 | Forge | 17 | `0.1.11` | Inventory fixes | загружен на Modrinth и CurseForge |
+| `forge-1.20.1` | 1.20.1 | Forge | 17 | `0.1.12` | Shulker tooltip fix | готовится к публикации |
 | `fabric-1.20.1` | 1.20.1 | Fabric | 17 | `0.1.12` | Initial Fabric release | загружен на Modrinth и CurseForge |
 | `forge-1.21` | 1.21 | Forge | 21 | `0.1.15` | Inventory and shulker tooltip fixes | загружен на Modrinth и CurseForge |
 | `fabric-1.21` | 1.21 | Fabric | 21 | `0.1.16` | Inventory and shulker tooltip fixes | загружен на Modrinth и CurseForge |
@@ -124,6 +124,9 @@ flowchart LR
 - Minecraft и Forge используют старую NBT-модель `ItemStack`.
 - Сеть требует отдельного [FriendlyByteBufMixin](forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/FriendlyByteBufMixin.java).
 - Клиентская синхронизация меню дополнительно проходит через Forge-сравнение `ItemStack.equals(stack, limitTags)`.
+- [ShulkerBoxBlockMixin](forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/ShulkerBoxBlockMixin.java) заменяет фасадное количество в literal-строках содержимого шалкера на exact-count типа `long`; регресс `0.1.11`, отображавший `400000` как `64`, исправлен в `0.1.12`.
+- [GiveCommandRegressionGameTests](forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/gametest/GiveCommandRegressionGameTests.java) подтверждает `/give` алмазной кирки и шалкерового ящика на сервере и после сетевой сериализации; также защищает общий `ItemStack.EMPTY` от изменения.
+- [ShulkerTooltipRegressionGameTests](forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/gametest/ShulkerTooltipRegressionGameTests.java) отдельно проверяет сохранённый exact-count `400000` и сформированную строку tooltip.
 - [AbstractContainerMenuInteractionMixin](forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerMenuInteractionMixin.java) содержит основную exact-логику кликов и remote-slot синхронизации.
 - [GuiGraphicsMixin](forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/GuiGraphicsMixin.java) обязан явно рисовать exact-count и ниже `1000`, если фасад уже ограничен `64`.
 
@@ -137,8 +140,9 @@ cd forge-1.20.1
 ```
 
 - Unit: [LongCountMathTest](forge-1.20.1/src/test/java/dev/asp1r/stackunlimiter/internal/LongCountMathTest.java), [StackCountDisplayTest](forge-1.20.1/src/test/java/dev/asp1r/stackunlimiter/client/StackCountDisplayTest.java).
-- Integration: [StackCountGameTests](forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java).
-- Результат: `forge-1.20.1/build/libs/`.
+- Integration: [StackCountGameTests](forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java), [GiveCommandRegressionGameTests](forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/gametest/GiveCommandRegressionGameTests.java), [ShulkerTooltipRegressionGameTests](forge-1.20.1/src/main/java/dev/asp1r/stackunlimiter/gametest/ShulkerTooltipRegressionGameTests.java); 25 обязательных GameTest входят в зафиксированный исходный код и проходят.
+- JAR: `forge-1.20.1/build/libs/stack_unlimiter-0.1.12.jar`.
+- SHA-256: `601BBE8CEA13E22809ED6D0239EE5A9D2F0CA211AC36986EAAD47CA6E669FDE8`.
 
 ## Fabric 1.20.1
 
@@ -455,13 +459,13 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 
 ### Tooltip шалкерового ящика показывает `64` вместо exact-count
 
-1. Проверить exact-count предмета внутри `DataComponents.CONTAINER`: если он сохранён, проблема относится только к отображению.
-2. В Minecraft 1.21 `ShulkerBoxBlock.appendHoverText` напрямую вызывает фасадный `ItemStack.getCount()`.
-3. В Minecraft 26.3 tooltip перенесён в `ItemContainerContents.addToTooltip` и использует ключ `item.container.item_count`; исправление 1.21 нельзя копировать без адаптации.
-4. Исправлять нужно только числовой аргумент строки количества, не меняя глобальную семантику `getCount()` и остальные строки tooltip.
-5. Регрессионный тест должен отдельно проверять сохранённое значение и сформированный аргумент перевода.
+1. В Minecraft 1.20.1 проверить exact-count внутри NBT `BlockEntityTag`; в Minecraft 1.21+ — внутри `DataComponents.CONTAINER`. Если он сохранён, проблема относится только к отображению.
+2. В Minecraft 1.20.1 и 1.21 `ShulkerBoxBlock.appendHoverText` напрямую вызывает фасадный `ItemStack.getCount()`; в 1.20.1 строка собирается как literal `"<name> x<count>"`.
+3. В Minecraft 26.3 tooltip перенесён в `ItemContainerContents.addToTooltip` и использует ключ `item.container.item_count`; исправление предыдущих версий нельзя копировать без адаптации.
+4. Исправлять нужно только числовой аргумент или суффикс строки количества, не меняя глобальную семантику `getCount()` и остальные строки tooltip.
+5. Регрессионный тест должен отдельно проверять сохранённое значение и сформированный текст или аргумент перевода.
 
-В Forge 1.21 отображение исправлено в `0.1.15`, в NeoForge 1.21 — в `0.1.18`, в Fabric 1.21 — в `0.1.16`, в Fabric 26.3 — в `0.1.10`, в Forge 26.3 — в `0.1.17`, а в NeoForge 26.3 — в `0.1.10`.
+В Forge 1.20.1 отображение исправлено в `0.1.12`, в Forge 1.21 — в `0.1.15`, в NeoForge 1.21 — в `0.1.18`, в Fabric 1.21 — в `0.1.16`, в Fabric 26.3 — в `0.1.10`, в Forge 26.3 — в `0.1.17`, а в NeoForge 26.3 — в `0.1.10`.
 
 ### Fabric запускается в dev, но падает в обычном лаунчере
 

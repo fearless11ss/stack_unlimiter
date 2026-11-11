@@ -25,6 +25,7 @@ updated: 2026-11-11
 | --- | --- | --- | --- | --- | --- | --- |
 | 1.20.1 | Forge | `0.1.7` | 17 | Modrinth, CurseForge | исторический релиз | Initial public beta |
 | 1.20.1 | Forge | `0.1.11` | 17 | Modrinth, CurseForge | загружен | Inventory fixes |
+| 1.20.1 | Forge | `0.1.12` | 17 | Modrinth, CurseForge | готовится к публикации | Shulker tooltip count fix |
 | 1.20.1 | Fabric | `0.1.12` | 17 | Modrinth, CurseForge | загружен | Initial Fabric release |
 | 1.21 | Forge | `0.1.13` | 21 | Modrinth, CurseForge | загружен | Initial Forge 1.21 release |
 | 1.21 | Forge | `0.1.14` | 21 | — | не публиковался; заменён `0.1.15` | Non-stackable `/give` fix |
@@ -105,6 +106,28 @@ updated: 2026-11-11
 - The mod must be installed on both the client and server
 - Back up your worlds before installing or updating
 - Worlds containing oversized stacks depend on this mod
+- Compatibility with every mod is not guaranteed
+```
+
+## Forge 1.20.1 — 0.1.12
+
+> [!note] Подготовлено к публикации
+> Release, display name `Stack Unlimiter 0.1.12 — Forge 1.20.1`, Minecraft `1.20.1`, loader `Forge`, Java 17, окружение Client + Server, без дополнительных зависимостей.
+
+```markdown
+# Shulker tooltip count fix
+
+## Fixed
+
+- Fixed shulker-box tooltips displaying `64` instead of the exact contained stack count
+- Preserved signed 64-bit counts when displaying shulker-box contents
+- Added regression coverage for non-stackable `/give` and shulker-box tooltips
+
+## Important
+
+- The mod must be installed on both the client and server
+- Worlds containing oversized stacks depend on this mod
+- Back up your worlds before installing or updating
 - Compatibility with every mod is not guaranteed
 ```
 
