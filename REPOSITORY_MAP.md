@@ -42,7 +42,7 @@ updated: 2026-11-11
 | Модуль | Minecraft | Loader | Java | Версия | Changelog | Статус |
 | --- | --- | --- | --- | --- | --- | --- |
 | `forge-1.20.1` | 1.20.1 | Forge | 17 | `0.1.12` | Shulker tooltip fix | загружен на Modrinth и CurseForge |
-| `fabric-1.20.1` | 1.20.1 | Fabric | 17 | `0.1.13` | Shulker tooltip count fix | готовится к публикации |
+| `fabric-1.20.1` | 1.20.1 | Fabric | 17 | `0.1.13` | Shulker tooltip count fix | загружен на Modrinth и CurseForge |
 | `forge-1.21` | 1.21 | Forge | 21 | `0.1.15` | Inventory and shulker tooltip fixes | загружен на Modrinth и CurseForge |
 | `fabric-1.21` | 1.21 | Fabric | 21 | `0.1.16` | Inventory and shulker tooltip fixes | загружен на Modrinth и CurseForge |
 | `neoforge-1.21` | 1.21 | NeoForge | 21 | `0.1.18` | Shulker tooltip count fix | загружен на Modrinth и CurseForge |
@@ -183,7 +183,7 @@ cd fabric-1.20.1
 
 ### Публикация
 
-- Modrinth и CurseForge: `0.1.12` загружен; `0.1.13` подготовлен как Release с display name `Stack Unlimiter 0.1.13 — Fabric 1.20.1` и changelog из [каталога релизов](RELEASE_CHANGELOGS.md).
+- Modrinth и CurseForge: `0.1.13` загружен как Release с display name `Stack Unlimiter 0.1.13 — Fabric 1.20.1`, Minecraft `1.20.1`, loader `Fabric`, Java 17, окружением Client + Server, без обязательной зависимости от Fabric API и с changelog из [каталога релизов](RELEASE_CHANGELOGS.md).
 
 ## Forge 1.21
 
