@@ -64,9 +64,13 @@ public final class StackCounts {
     }
 
     public static ItemStack copyWithCount(ItemStack stack, long count) {
-        if (count == 0 || get(stack) == 0) {
+        if (get(stack) == 0) {
             return ItemStack.EMPTY;
         }
+        // Vanilla Inventory.add creates a typed zero-count placeholder and
+        // grows it after placing it into an empty slot. Returning the global
+        // ItemStack.EMPTY singleton here would make vanilla grow that shared
+        // singleton and silently lose non-stackable items such as tools.
         ItemStack result = stack.copy();
         set(result, count);
         return result;

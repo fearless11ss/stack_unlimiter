@@ -46,7 +46,7 @@ updated: 2026-11-11
 | `forge-1.21` | 1.21 | Forge | 21 | `0.1.15` | Inventory and shulker tooltip fixes | загружен на Modrinth и CurseForge |
 | `fabric-1.21` | 1.21 | Fabric | 21 | `0.1.16` | Inventory and shulker tooltip fixes | загружен на Modrinth и CurseForge |
 | `neoforge-1.21` | 1.21 | NeoForge | 21 | `0.1.18` | Shulker tooltip count fix | загружен на Modrinth и CurseForge |
-| `forge-26.3` | 26.3 | Forge | 25 | `0.1.16` | Initial Forge 26.3 release | загружен на Modrinth и CurseForge |
+| `forge-26.3` | 26.3 | Forge | 25 | `0.1.17` | Inventory and container tooltip fixes | собран; `0.1.16` загружен на Modrinth и CurseForge |
 | `fabric-26.3` | 26.3 | Fabric | 25+ для Gradle | `0.1.10` | Inventory and container tooltip fixes | загружен на Modrinth и CurseForge |
 | `neoforge-26.3` | 26.3 | NeoForge | 25 | `0.1.9` | Initial NeoForge release | загружен на Modrinth и CurseForge |
 
@@ -318,6 +318,8 @@ cd neoforge-1.21
 
 - Exact-count хранится в `DataComponents.CUSTOM_DATA`.
 - [StackCounts.sameItemSameComponents](forge-26.3/src/main/java/dev/asp1r/stackunlimiter/api/StackCounts.java) игнорирует только внутренний exact-count при сравнении custom data.
+- [StackCounts.copyWithCount](forge-26.3/src/main/java/dev/asp1r/stackunlimiter/api/StackCounts.java) сохраняет тип предмета у нулевой копии, чтобы ванильный `Inventory.add` не терял принципиально нестакаемые инструменты и шалкеровые ящики при `/give` и не изменял общий `ItemStack.EMPTY`.
+- [ItemContainerContentsMixin](forge-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/ItemContainerContentsMixin.java) сохраняет ванильную структуру tooltip контейнера, но передаёт exact-count типа `long` вместо фасадного значения `64`.
 - [BulkCraftingDispatch](forge-26.3/src/main/java/dev/asp1r/stackunlimiter/internal/BulkCraftingDispatch.java) координирует bulk crafting.
 - Forge-совместимость с capability-инвентарями находится в [ItemStackHandlerMixin](forge-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/ItemStackHandlerMixin.java).
 - Описания GameTest лежат в `src/main/resources/data/stack_unlimiter/test_instance/`.
@@ -333,7 +335,17 @@ cd forge-26.3
 
 - Unit: `src/test/java/dev/asp1r/stackunlimiter/`.
 - Integration: [StackCountGameTests](forge-26.3/src/main/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java).
-- Результат: `forge-26.3/build/libs/`.
+- Регрессионный тест проверяет `/give` для алмазной кирки и шалкерового ящика и подтверждает, что глобальный `ItemStack.EMPTY` не изменяется.
+- Регрессионный тест контейнерного tooltip подтверждает, что exact-count `400000` сохраняется внутри шалкера и отображается без подмены на `64`.
+- Подтверждённое состояние `0.1.17`: unit-тесты, `clean build` и все 39 обязательных тестов `runGameTestServer` проходят.
+- JAR: `forge-26.3/build/libs/stack_unlimiter-forge-26.3-0.1.17.jar`.
+- SHA-256: `6ED21DA632BA3D980423DF2CAA36318F04482962037A1233DA1C97EB4F91E867`.
+- Metadata JAR: Minecraft строго `26.3`, Forge `>=66`, Java 25; class-file version `69`.
+
+### Публикация
+
+- Modrinth и CurseForge: `0.1.16` загружен как Release с display name `Stack Unlimiter 0.1.16 — Forge 26.3`.
+- Исправление `0.1.17` собрано и проверено, но ещё не загружено на площадки; changelog подготовлен в [каталоге релизов](RELEASE_CHANGELOGS.md).
 
 ## Fabric 26.3
 
@@ -432,7 +444,7 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 3. Нельзя возвращать глобальный `ItemStack.EMPTY`, иначе последующий `grow` изменит singleton пустого стака и предмет потеряется.
 4. Регрессионный тест должен проверять инструмент и шалкеровый ящик как на сервере, так и после сетевой сериализации меню.
 
-В NeoForge 1.21 ошибка исправлена в `0.1.17`, в Forge 1.21 — в `0.1.14`, в Fabric 1.21 — в `0.1.16`, а в Fabric 26.3 — в `0.1.10`. Для каждой другой ветки нужен отдельный полный прогон её GameTest перед переносом исправления.
+В NeoForge 1.21 ошибка исправлена в `0.1.17`, в Forge 1.21 — в `0.1.14`, в Fabric 1.21 — в `0.1.16`, в Fabric 26.3 — в `0.1.10`, а в Forge 26.3 — в `0.1.17`. Для каждой другой ветки нужен отдельный полный прогон её GameTest перед переносом исправления.
 
 ### Tooltip шалкерового ящика показывает `64` вместо exact-count
 
@@ -442,7 +454,7 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 4. Исправлять нужно только числовой аргумент строки количества, не меняя глобальную семантику `getCount()` и остальные строки tooltip.
 5. Регрессионный тест должен отдельно проверять сохранённое значение и сформированный аргумент перевода.
 
-В Forge 1.21 отображение исправлено в `0.1.15`, в NeoForge 1.21 — в `0.1.18`, в Fabric 1.21 — в `0.1.16`, а в Fabric 26.3 — в `0.1.10`.
+В Forge 1.21 отображение исправлено в `0.1.15`, в NeoForge 1.21 — в `0.1.18`, в Fabric 1.21 — в `0.1.16`, в Fabric 26.3 — в `0.1.10`, а в Forge 26.3 — в `0.1.17`.
 
 ### Fabric запускается в dev, но падает в обычном лаунчере
 

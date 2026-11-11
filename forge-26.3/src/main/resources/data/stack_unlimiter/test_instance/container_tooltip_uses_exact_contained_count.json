@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "stack_unlimiter:container_tooltip_uses_exact_contained_count",
+  "max_ticks": 100,
+  "structure": "forge:empty3x3x3"
+}

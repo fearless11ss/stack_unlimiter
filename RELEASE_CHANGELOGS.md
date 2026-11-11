@@ -34,6 +34,7 @@ updated: 2026-11-11
 | 1.21 | NeoForge | `0.1.17` | 21 | Modrinth, CurseForge | загружен | Initial NeoForge 1.21 release |
 | 1.21 | NeoForge | `0.1.18` | 21 | Modrinth, CurseForge | загружен | Shulker tooltip count fix |
 | 26.3 | Forge | `0.1.16` | 25 | Modrinth, CurseForge | загружен | Initial Forge 26.3 release |
+| 26.3 | Forge | `0.1.17` | 25 | Modrinth, CurseForge | текст подготовлен | Inventory and container tooltip fixes |
 | 26.3 | Fabric | `0.1.9` | 25 | Modrinth, CurseForge | загружен | Initial Fabric release |
 | 26.3 | Fabric | `0.1.10` | 25 | Modrinth, CurseForge | загружен | Inventory and container tooltip fixes |
 | 26.3 | NeoForge | `0.1.9` | 25 | Modrinth, CurseForge | загружен | Initial NeoForge release |
@@ -209,6 +210,30 @@ Stack Unlimiter is now available for Forge on Minecraft 26.3.
 - Splits oversized stacks using their exact count
 - Keeps bulk crafting authoritative on the server
 - Uses exact counts for drag previews, double-click collection, and nearby item pickup
+
+## Important
+
+- The mod must be installed on both the client and server
+- Worlds containing oversized stacks depend on this mod
+- Back up your worlds before installing or updating
+- Compatibility with every mod is not guaranteed
+```
+
+## Forge 26.3 — 0.1.17
+
+> [!info] Текст подготовлен для публикации
+> Используй display name `Stack Unlimiter 0.1.17 — Forge 26.3`, Minecraft `26.3`, loader `Forge`, Java 25, окружение Client + Server, тип Release и без дополнительных зависимостей.
+
+```markdown
+# Inventory and container tooltip fixes
+
+## Fixed
+
+- Fixed `/give` silently losing intentionally non-stackable items such as tools and shulker boxes
+- Fixed container and shulker-box tooltips displaying `64` instead of the exact contained stack count
+- Preserved item types in zero-count copies used by vanilla inventory insertion
+- Prevented inventory insertion from mutating Minecraft's shared empty-stack singleton
+- Preserved signed 64-bit counts when displaying container contents
 
 ## Important
 

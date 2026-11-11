@@ -8,6 +8,7 @@
     "GiveCommandMixin",
     "InventoryMixin",
     "InventoryMenuMixin",
+    "ItemContainerContentsMixin",
     "ItemStackHandlerMixin",
     "ItemStackMixin",
     "ServerPlaceRecipeMixin",
