@@ -6,6 +6,7 @@ import dev.asp1r.stackunlimiter.api.StackCounts;
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestAssertException;
@@ -16,6 +17,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.Connection;
 import net.minecraft.network.HashedStack;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.game.ServerboundContainerClickPacket;
 import net.minecraft.resources.Identifier;
@@ -37,6 +39,8 @@ import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.phys.AABB;
@@ -120,22 +124,62 @@ public final class StackCountGameTests {
         ServerPlayer player = createPlayer(helper, "stack-unlimiter-give-test");
         player.getInventory().clearContent();
 
-        try {
-            helper.getLevel().getServer().getCommands().performPrefixedCommand(
-                    player.createCommandSourceStack().withPermission(LevelBasedPermissionSet.OWNER),
-                    "give @s minecraft:cobblestone 2000"
-            );
-        } catch (NullPointerException exception) {
-            if (exception.getMessage() == null
-                    || (!exception.getMessage().contains("channel")
-                    && !exception.getMessage().contains("connection"))) {
-                throw exception;
-            }
-        }
+        performCommand(helper, player, "give @s minecraft:cobblestone 2000");
 
         assertEquals(1, countOccupiedInventorySlots(player), "occupied inventory slots after give");
         assertEquals(2_000, countInventoryItem(player, Items.COBBLESTONE), "given item total");
         helper.succeed();
+    }
+
+    @GameTest
+    public void giveCommandPreservesNonStackableItems(GameTestHelper helper) {
+        ServerPlayer player = createPlayer(helper, "stack-unlimiter-non-stackable-give-test");
+        player.getInventory().clearContent();
+
+        performCommand(helper, player, "give @s minecraft:diamond_pickaxe");
+        performCommand(helper, player, "give @s minecraft:shulker_box");
+
+        assertEquals(1, countInventoryItem(player, Items.DIAMOND_PICKAXE),
+                "server pickaxe count after give");
+        assertEquals(1, countInventoryItem(player, Items.SHULKER_BOX),
+                "server shulker-box count after give");
+        assertEquals(0, StackCounts.get(ItemStack.EMPTY), "shared empty-stack count after give");
+        helper.succeed();
+    }
+
+    @GameTest
+    public void containerTooltipUsesExactContainedCount(GameTestHelper helper) {
+        ItemStack planks = exactStack(Items.OAK_PLANKS, 400_000);
+        ItemStack shulker = new ItemStack(Items.SHULKER_BOX);
+        shulker.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(List.of(planks)));
+
+        ItemStack stored = shulker.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY)
+                .nonEmptyItemCopyStream()
+                .findFirst()
+                .orElseThrow(() -> new GameTestAssertException(
+                        Component.literal("shulker contained stack is missing"),
+                        0
+                ));
+        assertEquals(400_000, StackCounts.get(stored), "exact count stored inside shulker");
+
+        for (Component line : shulker.getTooltipLines(
+                Item.TooltipContext.of(helper.getLevel()),
+                null,
+                TooltipFlag.NORMAL
+        )) {
+            if (line.getContents() instanceof TranslatableContents contents
+                    && contents.getKey().equals("item.container.item_count")) {
+                Object displayedCount = contents.getArgs()[0];
+                assertEquals(400_000, ((Number) displayedCount).longValue(),
+                        "container tooltip contained count");
+                helper.succeed();
+                return;
+            }
+        }
+        throw new GameTestAssertException(
+                Component.literal("container tooltip item-count line was not generated"),
+                0
+        );
     }
 
     @GameTest
@@ -650,6 +694,21 @@ public final class StackCountGameTests {
                 new GameProfile(UUID.randomUUID(), name),
                 ClientInformation.createDefault()
         );
+    }
+
+    private static void performCommand(GameTestHelper helper, ServerPlayer player, String command) {
+        try {
+            helper.getLevel().getServer().getCommands().performPrefixedCommand(
+                    player.createCommandSourceStack().withPermission(LevelBasedPermissionSet.OWNER),
+                    command
+            );
+        } catch (NullPointerException exception) {
+            if (exception.getMessage() == null
+                    || (!exception.getMessage().contains("channel")
+                    && !exception.getMessage().contains("connection"))) {
+                throw exception;
+            }
+        }
     }
 
     private static ServerPlayer createConnectedPlayer(GameTestHelper helper, String name) {

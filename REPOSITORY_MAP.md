@@ -8,7 +8,7 @@ tags:
   - development
   - repository-map
 status: active
-updated: 2026-11-10
+updated: 2026-11-11
 ---
 
 # Stack Unlimiter — карта репозитория
@@ -47,7 +47,7 @@ updated: 2026-11-10
 | `fabric-1.21` | 1.21 | Fabric | 21 | `0.1.16` | Inventory and shulker tooltip fixes | загружен на Modrinth и CurseForge |
 | `neoforge-1.21` | 1.21 | NeoForge | 21 | `0.1.18` | Shulker tooltip count fix | загружен на Modrinth и CurseForge |
 | `forge-26.3` | 26.3 | Forge | 25 | `0.1.16` | Initial Forge 26.3 release | загружен на Modrinth и CurseForge |
-| `fabric-26.3` | 26.3 | Fabric | 25+ для Gradle | `0.1.9` | Initial Fabric release | загружен на Modrinth и CurseForge |
+| `fabric-26.3` | 26.3 | Fabric | 25+ для Gradle | `0.1.10` | Inventory and container tooltip fixes | собран; `0.1.9` загружен на Modrinth и CurseForge |
 | `neoforge-26.3` | 26.3 | NeoForge | 25 | `0.1.9` | Initial NeoForge release | загружен на Modrinth и CurseForge |
 
 > [!warning] Независимые реализации
@@ -349,6 +349,8 @@ cd forge-26.3
 - Здесь нет Forge `ItemStackHandlerMixin`.
 - [AbstractContainerMenuInteractionMixin](fabric-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerMenuInteractionMixin.java) обрабатывает exact-count для ЛКМ, ПКМ, Shift-click, выброса, double-click, number key и drag.
 - [InventoryMixin](fabric-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/InventoryMixin.java) отдельно перехватывает выброс всего выбранного хотбар-стака через `removeFromSelected`.
+- [StackCounts.copyWithCount](fabric-26.3/src/main/java/dev/asp1r/stackunlimiter/api/StackCounts.java) сохраняет тип предмета у нулевой копии, чтобы ванильный `Inventory.add` не терял принципиально нестакаемые инструменты и шалкеровые ящики при `/give` и не изменял общий `ItemStack.EMPTY`.
+- [ItemContainerContentsMixin](fabric-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/ItemContainerContentsMixin.java) сохраняет ванильную структуру tooltip контейнера, но передаёт exact-count типа `long` вместо фасадного значения `64`.
 - [BulkCraftingDispatch](fabric-26.3/src/main/java/dev/asp1r/stackunlimiter/internal/BulkCraftingDispatch.java) оставляет массовый крафт авторитетным серверу и не позволяет клиентскому предсказанию повторно обработать результат.
 - [AbstractContainerScreenMixin](fabric-26.3/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerScreenMixin.java) использует exact-count при предпросмотре drag-распределения.
 - Для текста количества нужен непрозрачный ARGB `0xFFFFFFFF`: `0xFFFFFF` имеет нулевой alpha и делает подпись невидимой в Minecraft 26.3.
@@ -368,8 +370,17 @@ cd fabric-26.3
 
 - Unit: `src/test/java/dev/asp1r/stackunlimiter/`.
 - Integration: [StackCountGameTests](fabric-26.3/src/gametest/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java).
-- Подтверждённое состояние `0.1.9`: `test`, `clean build` и все 34 теста, обнаруженные `runGameTest`, проходят.
-- Результат: `fabric-26.3/build/libs/`.
+- Регрессионный тест проверяет `/give` для алмазной кирки и шалкерового ящика и подтверждает, что глобальный `ItemStack.EMPTY` не изменяется.
+- Регрессионный тест контейнерного tooltip подтверждает, что exact-count `400000` сохраняется внутри шалкера и отображается без подмены на `64`.
+- Подтверждённое состояние `0.1.10`: unit-тесты, `clean build` и все 36 обязательных тестов `runGameTest` проходят.
+- JAR: `fabric-26.3/build/libs/stack_unlimiter-fabric-26.3-0.1.10.jar`.
+- SHA-256: `FDAC783E3A3A0F44F6270E62E18A6F977B354EF8CBAFB6E65759D4F59A60A21C`.
+- Metadata JAR: Minecraft строго `26.3`, Fabric Loader `>=0.20.1`, Java `>=25`; class-file version `69`; Fabric API не объявлен runtime-зависимостью.
+
+### Публикация
+
+- Modrinth и CurseForge: `0.1.9` загружен как Release с display name `Stack Unlimiter 0.1.9 — Fabric 26.3`.
+- Исправление `0.1.10` собрано и проверено, но ещё не загружено на площадки.
 
 ## NeoForge 26.3
 
@@ -421,16 +432,17 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 3. Нельзя возвращать глобальный `ItemStack.EMPTY`, иначе последующий `grow` изменит singleton пустого стака и предмет потеряется.
 4. Регрессионный тест должен проверять инструмент и шалкеровый ящик как на сервере, так и после сетевой сериализации меню.
 
-В NeoForge 1.21 ошибка исправлена в `0.1.17`, в Forge 1.21 — в `0.1.14`, а в Fabric 1.21 — в `0.1.16`. Для каждой другой ветки нужен отдельный полный прогон её GameTest перед переносом исправления.
+В NeoForge 1.21 ошибка исправлена в `0.1.17`, в Forge 1.21 — в `0.1.14`, в Fabric 1.21 — в `0.1.16`, а в Fabric 26.3 — в `0.1.10`. Для каждой другой ветки нужен отдельный полный прогон её GameTest перед переносом исправления.
 
 ### Tooltip шалкерового ящика показывает `64` вместо exact-count
 
 1. Проверить exact-count предмета внутри `DataComponents.CONTAINER`: если он сохранён, проблема относится только к отображению.
 2. В Minecraft 1.21 `ShulkerBoxBlock.appendHoverText` напрямую вызывает фасадный `ItemStack.getCount()`.
-3. Исправлять нужно числовой аргумент `container.shulkerBox.itemCount`, не меняя глобальную семантику `getCount()` и остальные строки tooltip.
-4. Регрессионный тест должен отдельно проверять сохранённое значение и сформированный аргумент перевода.
+3. В Minecraft 26.3 tooltip перенесён в `ItemContainerContents.addToTooltip` и использует ключ `item.container.item_count`; исправление 1.21 нельзя копировать без адаптации.
+4. Исправлять нужно только числовой аргумент строки количества, не меняя глобальную семантику `getCount()` и остальные строки tooltip.
+5. Регрессионный тест должен отдельно проверять сохранённое значение и сформированный аргумент перевода.
 
-В Forge 1.21 отображение исправлено в `0.1.15`, в NeoForge 1.21 — в `0.1.18`, а в Fabric 1.21 — в `0.1.16`.
+В Forge 1.21 отображение исправлено в `0.1.15`, в NeoForge 1.21 — в `0.1.18`, в Fabric 1.21 — в `0.1.16`, а в Fabric 26.3 — в `0.1.10`.
 
 ### Fabric запускается в dev, но падает в обычном лаунчере
 
