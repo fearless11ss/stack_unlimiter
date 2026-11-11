@@ -35,11 +35,11 @@ updated: 2026-11-11
 | 1.21 | NeoForge | `0.1.18` | 21 | Modrinth, CurseForge | загружен | Shulker tooltip count fix |
 | 26.3 | Forge | `0.1.16` | 25 | Modrinth, CurseForge | загружен | Initial Forge 26.3 release |
 | 26.3 | Fabric | `0.1.9` | 25 | Modrinth, CurseForge | загружен | Initial Fabric release |
-| 26.3 | Fabric | `0.1.10` | 25 | Modrinth, CurseForge | текст подготовлен | Inventory and container tooltip fixes |
+| 26.3 | Fabric | `0.1.10` | 25 | Modrinth, CurseForge | загружен | Inventory and container tooltip fixes |
 | 26.3 | NeoForge | `0.1.9` | 25 | Modrinth, CurseForge | загружен | Initial NeoForge release |
 
 > [!success] Ранее опубликованные сборки загружены
-> Forge 1.20.1 `0.1.11`, Fabric 1.20.1 `0.1.12`, Forge 1.21 `0.1.15`, Fabric 1.21 `0.1.16`, NeoForge 1.21 `0.1.18`, Forge 26.3 `0.1.16`, Fabric 26.3 `0.1.9` и NeoForge 26.3 `0.1.9` загружены на Modrinth и CurseForge.
+> Forge 1.20.1 `0.1.11`, Fabric 1.20.1 `0.1.12`, Forge 1.21 `0.1.15`, Fabric 1.21 `0.1.16`, NeoForge 1.21 `0.1.18`, Forge 26.3 `0.1.16`, Fabric 26.3 `0.1.10` и NeoForge 26.3 `0.1.9` загружены на Modrinth и CurseForge.
 
 ## Общие поля публикации
 
@@ -393,8 +393,8 @@ Stack Unlimiter is now available for Fabric.
 
 ## Fabric 26.3 — 0.1.10
 
-> [!info] Текст подготовлен для публикации
-> Используй display name `Stack Unlimiter 0.1.10 — Fabric 26.3`, Minecraft `26.3`, loader `Fabric`, Java 25, окружение Client + Server, тип Release и без обязательной зависимости от Fabric API.
+> [!success] Загрузка на Modrinth и CurseForge подтверждена
+> Файл загружен на обе площадки как Release с display name `Stack Unlimiter 0.1.10 — Fabric 26.3`, Minecraft `26.3`, loader `Fabric`, Java 25, окружением Client + Server и без обязательной зависимости от Fabric API.
 
 ```markdown
 # Inventory and container tooltip fixes
