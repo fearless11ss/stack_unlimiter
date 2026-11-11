@@ -42,7 +42,7 @@ updated: 2026-11-11
 | Модуль | Minecraft | Loader | Java | Версия | Changelog | Статус |
 | --- | --- | --- | --- | --- | --- | --- |
 | `forge-1.20.1` | 1.20.1 | Forge | 17 | `0.1.12` | Shulker tooltip fix | загружен на Modrinth и CurseForge |
-| `fabric-1.20.1` | 1.20.1 | Fabric | 17 | `0.1.12` | Initial Fabric release | загружен на Modrinth и CurseForge |
+| `fabric-1.20.1` | 1.20.1 | Fabric | 17 | `0.1.13` | Shulker tooltip count fix | готовится к публикации |
 | `forge-1.21` | 1.21 | Forge | 21 | `0.1.15` | Inventory and shulker tooltip fixes | загружен на Modrinth и CurseForge |
 | `fabric-1.21` | 1.21 | Fabric | 21 | `0.1.16` | Inventory and shulker tooltip fixes | загружен на Modrinth и CurseForge |
 | `neoforge-1.21` | 1.21 | NeoForge | 21 | `0.1.18` | Shulker tooltip count fix | загружен на Modrinth и CurseForge |
@@ -161,6 +161,7 @@ cd forge-1.20.1
 - Старая NBT-модель Minecraft 1.20.1 требует [LongCountNbt](fabric-1.20.1/src/main/java/dev/asp1r/stackunlimiter/internal/LongCountNbt.java) и [FriendlyByteBufMixin](fabric-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/FriendlyByteBufMixin.java).
 - [AbstractContainerMenuInteractionMixin](fabric-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/AbstractContainerMenuInteractionMixin.java) покрывает ЛКМ, ПКМ, Shift-click, number key, double-click, drag и выброс exact-стаков.
 - [InventoryMixin](fabric-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/InventoryMixin.java) объединяет подбор и вставку с существующим стаком, даже когда фасадный `count` уже равен `64`.
+- [ShulkerBoxBlockMixin](fabric-1.20.1/src/main/java/dev/asp1r/stackunlimiter/mixin/ShulkerBoxBlockMixin.java) заменяет фасадное `64` на точное количество в строках содержимого шалкера.
 - Forge-specific `ItemStackHandler` и crafting events не переносятся. Vanilla-инвентари, сундуки и крафт покрываются независимой Fabric-реализацией.
 - Fabric API `0.92.12+1.20.1` подключён только в среде разработки для GameTest. Итоговый JAR не содержит его и не объявляет runtime-зависимость; игроку нужен только Fabric Loader.
 - Поддерживаемая матрица loader: Forge, Fabric и NeoForge. Quilt не рассматривается.
@@ -176,13 +177,13 @@ cd fabric-1.20.1
 
 - Unit: `src/test/java/dev/asp1r/stackunlimiter/`.
 - Integration: [StackCountGameTests](fabric-1.20.1/src/gametest/java/dev/asp1r/stackunlimiter/gametest/StackCountGameTests.java).
-- Подтверждённое состояние `0.1.12`: unit-тесты, `clean build` и все 22 теста `runGametest` проходят.
-- JAR: `fabric-1.20.1/build/libs/stack_unlimiter-fabric-1.20.1-0.1.12.jar`.
+- Подтверждённое состояние `0.1.13`: unit-тесты, `clean build` и все 24 теста `runGametest` проходят; проверены точная подсказка шалкера, `/give` нестакаемых предметов и синхронизация с клиентом.
+- JAR: `fabric-1.20.1/build/libs/stack_unlimiter-fabric-1.20.1-0.1.13.jar`.
 - Metadata JAR: Minecraft строго `1.20.1`, Fabric Loader `>=0.20.1`, Java `>=17`; class-file version `61`.
 
 ### Публикация
 
-- Modrinth и CurseForge: `0.1.12` загружен как Release с display name `Stack Unlimiter 0.1.12 — Fabric 1.20.1` и changelog из [каталога релизов](RELEASE_CHANGELOGS.md).
+- Modrinth и CurseForge: `0.1.12` загружен; `0.1.13` подготовлен как Release с display name `Stack Unlimiter 0.1.13 — Fabric 1.20.1` и changelog из [каталога релизов](RELEASE_CHANGELOGS.md).
 
 ## Forge 1.21
 
@@ -469,7 +470,7 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 4. Исправлять нужно только числовой аргумент или суффикс строки количества, не меняя глобальную семантику `getCount()` и остальные строки tooltip.
 5. Регрессионный тест должен отдельно проверять сохранённое значение и сформированный текст или аргумент перевода.
 
-В Forge 1.20.1 отображение исправлено в `0.1.12`, в Forge 1.21 — в `0.1.15`, в NeoForge 1.21 — в `0.1.18`, в Fabric 1.21 — в `0.1.16`, в Fabric 26.3 — в `0.1.10`, в Forge 26.3 — в `0.1.17`, а в NeoForge 26.3 — в `0.1.10`.
+В Forge 1.20.1 отображение исправлено в `0.1.12`, в Fabric 1.20.1 — в `0.1.13`, в Forge 1.21 — в `0.1.15`, в NeoForge 1.21 — в `0.1.18`, в Fabric 1.21 — в `0.1.16`, в Fabric 26.3 — в `0.1.10`, в Forge 26.3 — в `0.1.17`, а в NeoForge 26.3 — в `0.1.10`.
 
 ### Fabric запускается в dev, но падает в обычном лаунчере
 

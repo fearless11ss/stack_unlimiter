@@ -13,7 +13,7 @@ depend on the mod and should be backed up before installation or updates.
 | Source directory | Minecraft | Mod loader | Mod version | Java |
 | --- | --- | --- | --- | --- |
 | [`forge-1.20.1`](forge-1.20.1/) | 1.20.1 | Forge | 0.1.12 | 17 |
-| [`fabric-1.20.1`](fabric-1.20.1/) | 1.20.1 | Fabric | 0.1.12 | 17 |
+| [`fabric-1.20.1`](fabric-1.20.1/) | 1.20.1 | Fabric | 0.1.13 | 17 |
 | [`forge-1.21`](forge-1.21/) | 1.21 | Forge | 0.1.15 | 21 |
 | [`fabric-1.21`](fabric-1.21/) | 1.21 | Fabric | 0.1.16 | 21 |
 | [`neoforge-1.21`](neoforge-1.21/) | 1.21 | NeoForge | 0.1.18 | 21 |

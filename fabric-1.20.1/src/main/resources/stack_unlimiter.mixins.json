@@ -10,6 +10,7 @@
     "InventoryMixin",
     "InventoryMenuMixin",
     "ItemStackMixin",
+    "ShulkerBoxBlockMixin",
     "SlotMixin",
     "StackedContentsMixin"
   ],

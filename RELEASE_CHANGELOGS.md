@@ -27,6 +27,7 @@ updated: 2026-11-11
 | 1.20.1 | Forge | `0.1.11` | 17 | Modrinth, CurseForge | загружен | Inventory fixes |
 | 1.20.1 | Forge | `0.1.12` | 17 | Modrinth, CurseForge | загружен | Shulker tooltip count fix |
 | 1.20.1 | Fabric | `0.1.12` | 17 | Modrinth, CurseForge | загружен | Initial Fabric release |
+| 1.20.1 | Fabric | `0.1.13` | 17 | Modrinth, CurseForge | подготовлен | Shulker tooltip count fix |
 | 1.21 | Forge | `0.1.13` | 21 | Modrinth, CurseForge | загружен | Initial Forge 1.21 release |
 | 1.21 | Forge | `0.1.14` | 21 | — | не публиковался; заменён `0.1.15` | Non-stackable `/give` fix |
 | 1.21 | Forge | `0.1.15` | 21 | Modrinth, CurseForge | загружен | Inventory and shulker tooltip fixes |
@@ -403,6 +404,28 @@ Stack Unlimiter is now available for Fabric on Minecraft 1.20.1.
 - Displays large stack counts using compact labels
 - Preserves oversized stacks during saving and synchronization
 - Does not require Fabric API at runtime
+
+## Important
+
+- The mod must be installed on both the client and server
+- Worlds containing oversized stacks depend on this mod
+- Back up your worlds before installing or updating
+- Compatibility with every mod is not guaranteed
+```
+
+## Fabric 1.20.1 — 0.1.13
+
+> [!todo] Подготовлено для Modrinth и CurseForge
+> Использовать display name `Stack Unlimiter 0.1.13 — Fabric 1.20.1`, Minecraft `1.20.1`, loader `Fabric`, Java 17, окружение Client + Server и не добавлять Fabric API как обязательную зависимость.
+
+```markdown
+# Shulker tooltip count fix
+
+## Fixed
+
+- Fixed shulker-box tooltips displaying `64` instead of the exact contained stack count
+- Preserved signed 64-bit counts when displaying shulker-box contents
+- Added regression coverage for non-stackable `/give` and client synchronization
 
 ## Important
 

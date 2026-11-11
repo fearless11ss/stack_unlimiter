@@ -11,11 +11,13 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.game.ClientboundContainerSetContentPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.StackedContents;
@@ -25,11 +27,15 @@ import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.ContainerSynchronizer;
 import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.phys.AABB;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -104,6 +110,76 @@ public final class StackCountGameTests implements FabricGameTest {
         }
         assertEquals(1, occupiedSlots, "occupied inventory slots");
         assertEquals(2_000, total, "given item total");
+        helper.succeed();
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    public void giveCommandPreservesNonStackableItems(GameTestHelper helper) {
+        ServerPlayer player = stackUnlimiter$createPlayer(
+                helper,
+                "stack-unlimiter-give-regression"
+        );
+
+        stackUnlimiter$performCommand(player, "give @s minecraft:diamond_pickaxe");
+        stackUnlimiter$performCommand(player, "give @s minecraft:shulker_box");
+
+        assertEquals(1, stackUnlimiter$countInventoryItem(player, Items.DIAMOND_PICKAXE),
+                "server pickaxe count after /give");
+        assertEquals(1, stackUnlimiter$countInventoryItem(player, Items.SHULKER_BOX),
+                "server shulker-box count after /give");
+        assertEquals(0, StackCounts.get(ItemStack.EMPTY),
+                "shared empty-stack count after /give");
+
+        ClientboundContainerSetContentPacket decoded = stackUnlimiter$roundTripMenu(
+                player.inventoryMenu
+        );
+        long clientPickaxes = 0;
+        long clientShulkerBoxes = 0;
+        for (ItemStack stack : decoded.getItems()) {
+            if (stack.is(Items.DIAMOND_PICKAXE)) {
+                clientPickaxes += StackCounts.get(stack);
+            } else if (stack.is(Items.SHULKER_BOX)) {
+                clientShulkerBoxes += StackCounts.get(stack);
+            }
+        }
+        assertEquals(1, clientPickaxes, "client pickaxe count after synchronization");
+        assertEquals(1, clientShulkerBoxes, "client shulker-box count after synchronization");
+        helper.succeed();
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    public void shulkerTooltipUsesExactContainedCount(GameTestHelper helper) {
+        ItemStack planks = new ItemStack(Items.OAK_PLANKS, 64);
+        StackCounts.set(planks, 400_000L);
+
+        NonNullList<ItemStack> contents = NonNullList.withSize(27, ItemStack.EMPTY);
+        contents.set(0, planks);
+        CompoundTag blockEntityData = ContainerHelper.saveAllItems(new CompoundTag(), contents);
+
+        ItemStack shulker = new ItemStack(Items.SHULKER_BOX);
+        BlockItem.setBlockEntityData(shulker, BlockEntityType.SHULKER_BOX, blockEntityData);
+
+        NonNullList<ItemStack> loaded = NonNullList.withSize(27, ItemStack.EMPTY);
+        ContainerHelper.loadAllItems(BlockItem.getBlockEntityData(shulker), loaded);
+        assertEquals(400_000L, StackCounts.get(loaded.get(0)),
+                "exact count stored inside shulker");
+
+        List<Component> tooltip = new ArrayList<>();
+        shulker.getItem().appendHoverText(
+                shulker,
+                helper.getLevel(),
+                tooltip,
+                TooltipFlag.NORMAL
+        );
+        String rendered = tooltip.stream()
+                .map(Component::getString)
+                .reduce((first, second) -> first + " | " + second)
+                .orElse("");
+        if (!rendered.contains("Oak Planks x400000")) {
+            throw new GameTestAssertException(
+                    "expected exact shulker tooltip count, got: " + rendered
+            );
+        }
         helper.succeed();
     }
 
@@ -622,6 +698,21 @@ public final class StackCountGameTests implements FabricGameTest {
         connection.setListener(player.connection);
         player.getInventory().clearContent();
         return player;
+    }
+
+    private static void stackUnlimiter$performCommand(ServerPlayer player, String command) {
+        try {
+            player.getServer().getCommands().performPrefixedCommand(
+                    player.createCommandSourceStack().withPermission(4),
+                    command
+            );
+        } catch (NullPointerException exception) {
+            if (exception.getMessage() == null
+                    || (!exception.getMessage().contains("channel")
+                    && !exception.getMessage().contains("connection"))) {
+                throw exception;
+            }
+        }
     }
 
     private static ItemStack stackUnlimiter$exactStack(net.minecraft.world.item.Item item, long count) {
